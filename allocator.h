@@ -26,7 +26,7 @@ namespace mini{
             return static_cast<T*>(::operator new(num*sizeof(T)));
         }
         //TODO: use num?
-        void _deallocate(pointer ptr,size_type num){
+        void _deallocate(pointer ptr){
             ::operator delete(static_cast<void*>(ptr));
         }
         void construct(pointer ptr, const_reference value){
@@ -41,8 +41,7 @@ namespace mini{
             if(request_bytes>128)
                 return _allocate(num);
 
-            obj **free_list_item=free_list;
-            free_list_item+=get_list_index(request_bytes);
+            obj **free_list_item=free_list+get_list_index(request_bytes);
             obj *result=*free_list_item;
 
             if(result==nullptr){
@@ -51,23 +50,32 @@ namespace mini{
                 //*free_list_item=static_cast<char*>(*result);
                 (*free_list_item)->next_block=result->next_block;
             }
+            return (T*)result;
 
         }
 
 
         void deallocate(pointer ptr,size_type num){
+            size_type request_bytes=num*sizeof(T);
+            if(request_bytes>128)
+                return _deallocate(ptr);
 
+            obj **free_list_item=free_list+get_list_index(request_bytes);
+            ((obj*)ptr)->next_block=*free_list_item;
+            *free_list_item=(obj*)ptr;
         }
 
     private:
+
+        union obj{
+            union obj *next_block;
+        };
 
         static obj* free_list[16];
         static char* start_free;
         static char* end_free;
 
-        union obj{
-            union obj *next_block;
-        };
+
 
         size_type round_up(size_type bytes){
             return (bytes+7)&(~7);
@@ -124,8 +132,20 @@ namespace mini{
                 start_free+=num_blocks*block_size;
                 return result;
             }else{
-                size_type left_fill_index=get_list_index(bytes_left)-1;
-                //put all left memory into proper list
+                if(bytes_left>=8){
+                    obj **free_list_item=free_list;
+                    size_type left_fill_index=get_list_index(bytes_left)-1;
+                    free_list_item += left_fill_index;
+                    size_type left_fill_block_size=(left_fill_index+1)*8;
+                    ((obj*)start_free)->next_block=*free_list_item;
+                    *free_list_item=(obj*)start_free;
+                    start_free+=left_fill_block_size;
+                }
+
+
+                start_free=(char*)(operator new(2*request_bytes));
+                end_free=start_free+2*request_bytes;
+                result=chunk_alloc(block_size,num_blocks);
             }
             return result;
         }
@@ -134,7 +154,7 @@ namespace mini{
 
     template <typename T> char* allocator<T>::start_free=nullptr;
     template <typename T> char* allocator<T>::end_free=nullptr;
-    template <typename T> char* allocator<T>::free_list[16]={
+    template <typename T> typename allocator<T>::obj* allocator<T>::free_list[16]={
             nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,
             nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr
     };

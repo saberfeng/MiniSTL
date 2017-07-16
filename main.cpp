@@ -26,15 +26,11 @@ void TestAllocator(){
     string_alloc.deallocate(string_ptr,2);
 }
 
-void TestPointerCast(){
-
-}
-
 
 int main() {
 
-    //TestAllocator();
-    TestPointerCast();
+    TestAllocator();
+
 
     return 0;
 }
