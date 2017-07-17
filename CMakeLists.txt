@@ -3,5 +3,5 @@ project(MiniSTL)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp allocator.h)
+set(SOURCE_FILES main.cpp allocator.h rb_tree.h)
 add_executable(MiniSTL ${SOURCE_FILES})

@@ -36,7 +36,7 @@ namespace mini{
             ptr->~T();
         }
 
-        T* allocate(size_type num){
+        T* allocate(size_type num=1){
             size_type request_bytes=num*sizeof(T);
             if(request_bytes>128)
                 return _allocate(num);
