@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <new>
 
+
 namespace mini{
 
     template <typename T>
@@ -48,7 +49,7 @@ namespace mini{
                 result=refill_lists(round_up(request_bytes));
             }else{
                 //*free_list_item=static_cast<char*>(*result);
-                (*free_list_item)->next_block=result->next_block;
+                *free_list_item=result->next_block;
             }
             return (T*)result;
 
@@ -108,7 +109,6 @@ namespace mini{
                 *free_list_item=chunk->next_block;
                 return chunk;
             }
-
         }
 
         char* chunk_alloc(size_type block_size,size_type &num_blocks){
