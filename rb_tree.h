@@ -149,6 +149,8 @@ namespace mini {
 
         void erase(node_ptr x);
 
+        node_ptr find(const_reference val);
+
         //--------------------------for Debugging----------------------------
         void DebugMidorderTraverseCore(node_ptr node) {
             if (node == nil)
@@ -175,9 +177,29 @@ namespace mini {
             DebugPreorderTraverseCore(root());
             std::cout << std::endl;
         }
+
+        rb_tree_color_type DebugGetColor(node_ptr node){return node->color;}
+        reference DebugGetValue(node_ptr node){return node->value;}
         //--------------------------------------------------------------------
 
     };
+
+    template<typename Key, typename Value, typename Compare, typename Alloc>
+    node_ptr rb_tree<Key, Value, Compare, Alloc>::
+    find(const_reference val){
+        node_ptr prev = root();
+        node_ptr node = prev;
+        while(node!=nil){
+            prev=node;
+            if(node->value == val)
+                return node;
+            else if(val < node->value)
+                node=node->left;
+            else
+                node = node->right;
+        }
+        return nullptr;
+    }
 
     template<typename Key, typename Value, typename Compare, typename Alloc>
     void rb_tree<Key, Value, Compare, Alloc>::
@@ -333,10 +355,33 @@ namespace mini {
                     x=root();
                 }
             }else{
+                node_ptr w=x->parent->right;
+                if(w->color==rb_tree_red){
+                    w->color=rb_tree_black;
+                    x->parent->color=rb_tree_red;
+                    rb_right_rotate(x->parent);
+                    w=x->parent->left;
+                }
+                if(x->left->color==rb_tree_black && w->right->color==rb_tree_black){
+                    w->color=rb_tree_red;
+                    x=x->parent;
+                }else{
+                    if(w->left->color=rb_tree_black){
+                        w->right->color=rb_tree_black;
+                        w->color=rb_tree_red;
+                        rb_left_rotate(w);
+                        w=x->parent->left;
+                    }
+                    w->color=x->parent->color;
+                    x->parent->color=rb_tree_black;
+                    w->left->color=rb_tree_black;
+                    rb_right_rotate(x->parent);
 
-
-
-                
+                    if(x->left==x)
+                        rb_transplant(x,nil);
+                    put_node(x);
+                    x=root();
+                }
             }
         }
         x->color=rb_tree_black;
