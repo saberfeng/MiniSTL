@@ -34,22 +34,40 @@ void TestRBTree() {
 
     tree.insert_unique(10);
     tree.insert_unique(7);
+
     tree.insert_unique(8);
     tree.insert_unique(15);
+
     tree.insert_unique(5);
     tree.insert_unique(6);
     tree.insert_unique(11);
     tree.insert_unique(13);
     tree.insert_unique(12);
+
     tree.insert_unique(20);
     tree.insert_unique(14);
     tree.insert_unique(16);
+    /**/
 
-    cout << "after insert size: " << tree.size() << endl;
+    cout << endl << "after insert size: " << tree.size() << endl;
     cout << "Traverse:" << endl;
     tree.DebugMidorderTraverse();
     tree.DebugPreorderTraverse();
 
+    typename mini::rb_tree<int, int, std::less<int>>::node_ptr node;
+    node = tree.find(10);
+    tree.erase(node);
+    cout << "after erase" << endl;
+    tree.DebugMidorderTraverse();
+    node = tree.find(6);
+    tree.erase(node);
+    cout << "after erase" << endl;
+    tree.DebugMidorderTraverse();
+
+    node = tree.find(16);
+    tree.erase(node);
+    cout << "after erase" << endl;
+    tree.DebugMidorderTraverse();
 }
 
 

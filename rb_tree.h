@@ -133,6 +133,13 @@ namespace mini {
 
         }
 
+        node_ptr create_tmp_nil() {
+            node_ptr tmp_nil = create_node(0);
+            tmp_nil->color = rb_tree_black;
+            tmp_nil->left = tmp_nil;
+            tmp_nil->right = tmp_nil;
+            return tmp_nil;
+        }
 
     public:
         rb_tree(const Compare &comp = Compare()) : node_count(0), key_compare(comp) { init(); }
@@ -178,23 +185,24 @@ namespace mini {
             std::cout << std::endl;
         }
 
-        rb_tree_color_type DebugGetColor(node_ptr node){return node->color;}
-        reference DebugGetValue(node_ptr node){return node->value;}
+        rb_tree_color_type DebugGetColor(node_ptr node) { return node->color; }
+
+        reference DebugGetValue(node_ptr node) { return node->value; }
         //--------------------------------------------------------------------
 
     };
 
     template<typename Key, typename Value, typename Compare, typename Alloc>
-    node_ptr rb_tree<Key, Value, Compare, Alloc>::
-    find(const_reference val){
+    typename rb_tree<Key, Value, Compare, Alloc>::node_ptr rb_tree<Key, Value, Compare, Alloc>::
+    find(const_reference val) {
         node_ptr prev = root();
         node_ptr node = prev;
-        while(node!=nil){
-            prev=node;
-            if(node->value == val)
+        while (node != nil) {
+            prev = node;
+            if (node->value == val)
                 return node;
-            else if(val < node->value)
-                node=node->left;
+            else if (val < node->value)
+                node = node->left;
             else
                 node = node->right;
         }
@@ -338,53 +346,58 @@ namespace mini {
                     w->color = rb_tree_red;
                     x = x->parent;
                 } else {
-                    if (w->right->color == rb_tree_black){
-                        w->left->color=rb_tree_black;
-                        w->color=rb_tree_red;
+                    if (w->right->color == rb_tree_black) {
+                        w->left->color = rb_tree_black;
+                        w->color = rb_tree_red;
                         rb_right_rotate(w);
-                        w=x->parent->right;
+                        w = x->parent->right;
                     }
-                    w->color=x->parent->color;
-                    x->parent->color=rb_tree_black;
-                    w->right->color=rb_tree_black;
+                    w->color = x->parent->color;
+                    x->parent->color = rb_tree_black;
+                    w->right->color = rb_tree_black;
                     rb_left_rotate(x->parent);
 
-                    if(x->left==x)
-                        rb_transplant(x,nil);
+                    if (x->left == x)
+                        rb_transplant(x, nil);
                     put_node(x);
-                    x=root();
+                    x = root();
                 }
-            }else{
-                node_ptr w=x->parent->right;
-                if(w->color==rb_tree_red){
-                    w->color=rb_tree_black;
-                    x->parent->color=rb_tree_red;
+            } else {
+                node_ptr w = x->parent->left;
+                if (w->color == rb_tree_red) {
+                    w->color = rb_tree_black;
+                    x->parent->color = rb_tree_red;
                     rb_right_rotate(x->parent);
-                    w=x->parent->left;
+                    w = x->parent->left;
                 }
-                if(x->left->color==rb_tree_black && w->right->color==rb_tree_black){
-                    w->color=rb_tree_red;
-                    x=x->parent;
-                }else{
-                    if(w->left->color=rb_tree_black){
-                        w->right->color=rb_tree_black;
-                        w->color=rb_tree_red;
+                if (x->left->color == rb_tree_black && w->right->color == rb_tree_black) {
+                    w->color = rb_tree_red;
+                    x = x->parent;
+                } else {
+                    if (w->left->color == rb_tree_black) {
+                        w->right->color = rb_tree_black;
+                        w->color = rb_tree_red;
                         rb_left_rotate(w);
-                        w=x->parent->left;
+                        w = x->parent->left;
                     }
-                    w->color=x->parent->color;
-                    x->parent->color=rb_tree_black;
-                    w->left->color=rb_tree_black;
+                    w->color = x->parent->color;
+                    x->parent->color = rb_tree_black;
+                    w->left->color = rb_tree_black;
                     rb_right_rotate(x->parent);
 
-                    if(x->left==x)
-                        rb_transplant(x,nil);
+                    if (x->left == x)
+                        rb_transplant(x, nil);
                     put_node(x);
-                    x=root();
+                    x = root();
                 }
             }
         }
-        x->color=rb_tree_black;
+        if (x != nil && x->left == x) {
+            rb_transplant(x, nil);
+            put_node(x);
+            x = root();
+        }
+        x->color = rb_tree_black;
     };
 
     template<typename Key, typename Value, typename Compare, typename Alloc>
@@ -393,10 +406,6 @@ namespace mini {
         node_ptr y = z;
         rb_tree_color_type y_original_color = y->color;
         node_ptr x = nullptr;
-        node_ptr tmp_nil = create_node(0);
-        tmp_nil->color = rb_tree_black;
-        tmp_nil->left=tmp_nil;
-        tmp_nil->right=tmp_nil;
 
         if (z->left == nil && z->right != nil) {
             x = z->right;
@@ -405,13 +414,18 @@ namespace mini {
             x = z->left;
             rb_transplant(z, x);
         } else if (z->left == nil && z->right == nil) {
-            x = tmp_nil;
+            if (y_original_color == rb_tree_black)
+                x = create_tmp_nil();
+            else
+                x = nil;
             rb_transplant(z, x);
         } else {
             y = rb_minimum(z->right);
+            y_original_color = y->color;
             x = y->right;
-            if (x == nil) {
-                x = tmp_nil;
+            if (x == nil && y_original_color ==
+                            rb_tree_black) { //only when need to fixup we create temporary nil node,otherwise tmp_nil won't be deallocated
+                x = create_tmp_nil();
                 x->parent = y;
                 y->right = x;
             }
@@ -427,6 +441,7 @@ namespace mini {
         }
         if (y_original_color == rb_tree_black)
             rb_delete_fixup(x);
+        put_node(z);
     }
 
 
