@@ -9,6 +9,7 @@
 #include <iostream>
 #include "allocator.h"
 #include "construct.h"
+#include "iterator.h"
 #include <memory>
 
 namespace mini {
@@ -27,8 +28,85 @@ namespace mini {
         ValueType value;
     };
 
+    template<class Value, class Reference, class Pointer>
+    class rb_tree_iterator : iterator_base<bidirectional_iterator_tag, Value, ptrdiff_t, Pointer, Reference> {
+    public:
+        typedef rb_tree_node<Value> *node_ptr;
+        typedef rb_tree_iterator<Value, Value &, Value *> iterator;
+        typedef rb_tree_iterator<Value, Reference, Pointer> self;
 
-    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc=allocator <rb_tree_node<Value>>>
+        rb_tree_iterator() {}
+
+        rb_tree_iterator(node_ptr ptr) { node = ptr; }
+
+        rb_tree_iterator(iterator i) { node = i.node; }
+
+        Reference operator*() const { return node->value; }
+
+        Pointer operator->() const { return &(operator*()); }
+
+        self &operator++() {
+            if(is_nil(node))
+                return *this;
+            if(!is_nil(node->right)){
+                node=node->right;
+                while(!is_nil(node->left))
+                    node=node->left;
+            }else{
+                node_ptr parent=node->parent;
+                while( !is_nil(parent) && node==parent->right){
+                    node=parent;
+                    parent=parent->parent;
+                }
+                node=parent; // if node is at the last position,point node to nil
+            }
+            return *this;
+        }
+        self operator++(int){
+            self tmp=*this;
+            operator++();
+            return tmp;
+        }
+
+        self &operator--(){
+            if(is_nil(node)){ //if node is at end(),point it to the last position
+                node=node->parent;
+                while(!is_nil(node->right))
+                    node=node->right;
+            }else{
+                if(!is_nil(node->left)){
+                    node=node->left;
+                    while(!is_nil(node->right))
+                        node=node->right;
+                }else{ // node is not nil and has no left child
+                    node_ptr parent=node->parent;
+                    node_ptr old_node=node;
+                    while(!is_nil(parent) && node==parent->left){
+                        node=parent;
+                        parent=parent->parent;
+                    }
+                    if(is_nil(parent)) // if node is at the first position, stay there
+                        node=old_node;
+                    else
+                        node=parent;
+                }
+            }
+            return *this;
+        }
+        self operator--(int){
+            self tmp=*this;
+            operator--();
+            return tmp;
+        }
+
+    private:
+        node_ptr node;
+
+        bool is_nil(node_ptr ptr){return ptr->left == ptr;}
+
+    };
+
+    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc=allocator<rb_tree_node<Value>>>
     class rb_tree {
 
     public:
@@ -37,10 +115,14 @@ namespace mini {
         typedef std::size_t size_type;
         typedef Value &reference;
         typedef const Value &const_reference;
+        typedef Value *pointer;
+        typedef rb_tree_iterator<Value, reference, pointer> iterator;
+
+        friend class rb_tree_iterator<Value, reference, pointer>;
 
     private:
 
-        allocator <rb_tree_node<Value>> rb_tree_node_allocator;
+        allocator<rb_tree_node<Value>> rb_tree_node_allocator;
         std::allocator<rb_tree_node<Value>> debug_tree_node_allocator;
 
         node_ptr get_node() {
@@ -195,7 +277,7 @@ namespace mini {
     };
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::node_ptr rb_tree<Key, Value, KeyOfValue,Compare, Alloc>::
+    typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::node_ptr rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     find(const Key &k) {
         node_ptr y = nil; //last node which is not less than key
         node_ptr x = root();
