@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 #include <functional>
+#include <vector>
 #include "allocator.h"
 #include "rb_tree.h"
 
@@ -32,22 +33,10 @@ void TestRBTree() {
     mini::rb_tree<int, int, std::less<int>> tree;
     cout << "before insert size: " << tree.size() << endl;
 
-    tree.insert_unique(10);
-    tree.insert_unique(7);
+    std::vector<int> input={10,7,8,15,5,6,11,13,12,20,14,16};
 
-    tree.insert_unique(8);
-    tree.insert_unique(15);
-
-    tree.insert_unique(5);
-    tree.insert_unique(6);
-    tree.insert_unique(11);
-    tree.insert_unique(13);
-    tree.insert_unique(12);
-
-    tree.insert_unique(20);
-    tree.insert_unique(14);
-    tree.insert_unique(16);
-    /**/
+    for(auto &i:input)
+        tree.insert_unique(i);
 
     cout << endl << "after insert size: " << tree.size() << endl;
     cout << "Traverse:" << endl;
@@ -55,19 +44,16 @@ void TestRBTree() {
     tree.DebugPreorderTraverse();
 
     typename mini::rb_tree<int, int, std::less<int>>::node_ptr node;
-    node = tree.find(10);
-    tree.erase(node);
-    cout << "after erase" << endl;
-    tree.DebugMidorderTraverse();
-    node = tree.find(6);
-    tree.erase(node);
-    cout << "after erase" << endl;
-    tree.DebugMidorderTraverse();
 
-    node = tree.find(16);
-    tree.erase(node);
-    cout << "after erase" << endl;
-    tree.DebugMidorderTraverse();
+    std::vector<int> vec={10,6,16,14,12,11,13,5,7,8,15,20};
+
+    for(auto &i : vec){
+        node = tree.find(i);
+        tree.erase(node);
+        cout<<"erase "<<i<<": "<<endl;
+        tree.DebugMidorderTraverse();
+    }
+
 }
 
 

@@ -333,6 +333,7 @@ namespace mini {
     template<typename Key, typename Value, typename Compare, typename Alloc>
     void rb_tree<Key, Value, Compare, Alloc>::
     rb_delete_fixup(node_ptr x) {
+        node_ptr old_x = x;
         while (x != root() && x->color == rb_tree_black) {
             if (x == x->parent->left) {
                 node_ptr w = x->parent->right;
@@ -357,9 +358,6 @@ namespace mini {
                     w->right->color = rb_tree_black;
                     rb_left_rotate(x->parent);
 
-                    if (x->left == x)
-                        rb_transplant(x, nil);
-                    put_node(x);
                     x = root();
                 }
             } else {
@@ -385,20 +383,16 @@ namespace mini {
                     w->left->color = rb_tree_black;
                     rb_right_rotate(x->parent);
 
-                    if (x->left == x)
-                        rb_transplant(x, nil);
-                    put_node(x);
-                    x = root();
                 }
             }
         }
-        if (x != nil && x->left == x) {
-            rb_transplant(x, nil);
-            put_node(x);
-            x = root();
+        if (old_x != nil && old_x->left == old_x) {//if old_x is a tmp_nil
+            rb_transplant(old_x, nil);
+            put_node(old_x);
         }
+        x = root();
         x->color = rb_tree_black;
-    };
+    }
 
     template<typename Key, typename Value, typename Compare, typename Alloc>
     void rb_tree<Key, Value, Compare, Alloc>::
