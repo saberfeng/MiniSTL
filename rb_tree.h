@@ -158,7 +158,7 @@ namespace mini {
 
         void erase(node_ptr x);
 
-        node_ptr find(const_reference val);
+        node_ptr find(const Key &key);
 
         //--------------------------for Debugging----------------------------
         void DebugMidorderTraverseCore(node_ptr node) {
@@ -195,26 +195,26 @@ namespace mini {
     };
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    typename rb_tree<Key, Value, Compare, Alloc>::node_ptr rb_tree<Key, Value, Compare, Alloc>::
-    find(const Key &key) {
-        node_ptr y=nil; //last node which is not less than key
-        node_ptr x=root();
+    typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::node_ptr rb_tree<Key, Value, KeyOfValue,Compare, Alloc>::
+    find(const Key &k) {
+        node_ptr y = nil; //last node which is not less than key
+        node_ptr x = root();
 
-        while(x!=nil){
-            if(!key_compare(key(x),key)){
-                y=x;
-                x=x->left;
-            }else
-                x=x->right;
+        while (x != nil) {
+            if (!key_compare(key(x), k)) {
+                y = x;
+                x = x->left;
+            } else
+                x = x->right;
         }
 
-        if(key_compare(key,key(y)))
-           y=nil;
+        if (key_compare(k, key(y)))
+            y = nil;
         return y;
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    void rb_tree<Key, Value, Compare, Alloc>::
+    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     rb_left_rotate(node_ptr x) {
         node_ptr y = x->right;
         x->right = y->left;
@@ -232,7 +232,7 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    void rb_tree<Key, Value, Compare, Alloc>::
+    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     rb_right_rotate(node_ptr x) {
         node_ptr y = x->left;
         x->left = y->right;
@@ -250,7 +250,7 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    void rb_tree<Key, Value, Compare, Alloc>::
+    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     rb_insert_fixup(node_ptr node) {
         while (node->parent->color == rb_tree_red) {
             if (node->parent == node->parent->parent->left) {
@@ -292,7 +292,7 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    void rb_tree<Key, Value, Compare, Alloc>::
+    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     rb_transplant(node_ptr old_node, node_ptr new_node) {
         if (new_node != nil)
             new_node->parent = old_node->parent;
@@ -305,7 +305,7 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    void rb_tree<Key, Value, Compare, Alloc>::
+    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     insert_unique(const_reference v) { //for map, Value is a pair
         node_ptr new_node = create_node(v);
         color(new_node) = rb_tree_red;
@@ -315,7 +315,7 @@ namespace mini {
         while (x != nil) {
             y = x;
             //if (v < x->value)
-            if (key_compare(KeyOfValue()(v),key(x)))
+            if (key_compare(KeyOfValue()(v), key(x)))
                 x = x->left;
             else
                 x = x->right;
@@ -323,7 +323,7 @@ namespace mini {
         new_node->parent = y;
         if (y == nil)
             nil->parent = new_node;
-        else if (key_compare(KeyOfValue()(v),key(y)))
+        else if (key_compare(KeyOfValue()(v), key(y)))
             y->left = new_node;
         else
             y->right = new_node;
@@ -336,7 +336,7 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    void rb_tree<Key, Value, Compare, Alloc>::
+    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     rb_delete_fixup(node_ptr x) {
         node_ptr old_x = x;
         while (x != root() && x->color == rb_tree_black) {
@@ -400,7 +400,7 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    void rb_tree<Key, Value, Compare, Alloc>::
+    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     erase(node_ptr z) {
         node_ptr y = z;
         rb_tree_color_type y_original_color = y->color;
