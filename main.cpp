@@ -3,11 +3,17 @@
 #include <string>
 #include <functional>
 #include <vector>
+
 #include "allocator.h"
 #include "rb_tree.h"
 
 using std::cout;
 using std::endl;
+
+template<typename T>
+struct identity {
+    const T &operator()(const T &x) { return x; }
+};
 
 void TestAllocator() {
 
@@ -30,12 +36,12 @@ void TestAllocator() {
 
 void TestRBTree() {
 
-    mini::rb_tree<int, int, std::less<int>> tree;
+    mini::rb_tree<int, int, identity<int>, std::less<int>> tree;
     cout << "before insert size: " << tree.size() << endl;
 
-    std::vector<int> input={10,7,8,15,5,6,11,13,12,20,14,16};
+    std::vector<int> input = {10, 7, 8, 15, 5, 6, 11, 13, 12, 20, 14, 16};
 
-    for(auto &i:input)
+    for (auto &i:input)
         tree.insert_unique(i);
 
     cout << endl << "after insert size: " << tree.size() << endl;
@@ -43,14 +49,14 @@ void TestRBTree() {
     tree.DebugMidorderTraverse();
     tree.DebugPreorderTraverse();
 
-    typename mini::rb_tree<int, int, std::less<int>>::node_ptr node;
+    typename mini::rb_tree<int, int, identity<int>, std::less<int>>::node_ptr node;
 
-    std::vector<int> vec={10,6,16,14,12,11,13,5,7,8,15,20};
+    std::vector<int> vec = {10, 6, 16, 14, 12, 11, 13, 5, 7, 8, 15, 20};
 
-    for(auto &i : vec){
+    for (auto &i : vec) {
         node = tree.find(i);
         tree.erase(node);
-        cout<<"erase "<<i<<": "<<endl;
+        cout << "erase " << i << ": " << endl;
         tree.DebugMidorderTraverse();
     }
 
