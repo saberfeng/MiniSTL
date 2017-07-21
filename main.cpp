@@ -52,20 +52,20 @@ void TestRBTree() {
     typename mini::rb_tree<int, int, identity<int>, std::less<int>>::node_ptr node;
 
     node = tree.find(5);
-    mini::rb_tree_iterator<int,int&,int*> iter(node);
-    cout<<"iterator iterates:"<<endl;
-    for(int i=0;i<15;++i){
-        cout<<*iter<<" ";
+    mini::rb_tree_iterator<int, int &, int *> iter(node);
+    cout << "iterator iterates:" << endl;
+    for (int i = 0; i < 15; ++i) {
+        cout << *iter << " ";
         ++iter;
     }
-    cout<<endl;
+    cout << endl;
 
-    cout<<"reversely iterates:"<<endl;
-    for(int i=0;i<24;++i){
+    cout << "reversely iterates:" << endl;
+    for (int i = 0; i < 24; ++i) {
         --iter;
-        cout<<*iter<<" ";
+        cout << *iter << " ";
     }
-    cout<<endl;
+    cout << endl;
 
 
     std::vector<int> vec = {10, 6, 16, 14, 12, 11, 13, 5, 7, 8, 15, 20};

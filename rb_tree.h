@@ -46,55 +46,57 @@ namespace mini {
         Pointer operator->() const { return &(operator*()); }
 
         self &operator++() {
-            if(is_nil(node))
+            if (is_nil(node))
                 return *this;
-            if(!is_nil(node->right)){
-                node=node->right;
-                while(!is_nil(node->left))
-                    node=node->left;
-            }else{
-                node_ptr parent=node->parent;
-                while( !is_nil(parent) && node==parent->right){
-                    node=parent;
-                    parent=parent->parent;
+            if (!is_nil(node->right)) {
+                node = node->right;
+                while (!is_nil(node->left))
+                    node = node->left;
+            } else {
+                node_ptr parent = node->parent;
+                while (!is_nil(parent) && node == parent->right) {
+                    node = parent;
+                    parent = parent->parent;
                 }
-                node=parent; // if node is at the last position,point node to nil
+                node = parent; // if node is at the last position,point node to nil
             }
             return *this;
         }
-        self operator++(int){
-            self tmp=*this;
+
+        self operator++(int) {
+            self tmp = *this;
             operator++();
             return tmp;
         }
 
-        self &operator--(){
-            if(is_nil(node)){ //if node is at end(),point it to the last position
-                node=node->parent;
-                while(!is_nil(node->right))
-                    node=node->right;
-            }else{
-                if(!is_nil(node->left)){
-                    node=node->left;
-                    while(!is_nil(node->right))
-                        node=node->right;
-                }else{ // node is not nil and has no left child
-                    node_ptr parent=node->parent;
-                    node_ptr old_node=node;
-                    while(!is_nil(parent) && node==parent->left){
-                        node=parent;
-                        parent=parent->parent;
+        self &operator--() {
+            if (is_nil(node)) { //if node is at end(),point it to the last position
+                node = node->parent;
+                while (!is_nil(node->right))
+                    node = node->right;
+            } else {
+                if (!is_nil(node->left)) {
+                    node = node->left;
+                    while (!is_nil(node->right))
+                        node = node->right;
+                } else { // node is not nil and has no left child
+                    node_ptr parent = node->parent;
+                    node_ptr old_node = node;
+                    while (!is_nil(parent) && node == parent->left) {
+                        node = parent;
+                        parent = parent->parent;
                     }
-                    if(is_nil(parent)) // if node is at the first position, stay there
-                        node=old_node;
+                    if (is_nil(parent)) // if node is at the first position, stay there
+                        node = old_node;
                     else
-                        node=parent;
+                        node = parent;
                 }
             }
             return *this;
         }
-        self operator--(int){
-            self tmp=*this;
+
+        self operator--(int) {
+            self tmp = *this;
             operator--();
             return tmp;
         }
@@ -102,9 +104,11 @@ namespace mini {
     private:
         node_ptr node;
 
-        bool is_nil(node_ptr ptr){return ptr->left == ptr;}
+        bool is_nil(node_ptr ptr) { return ptr->left == ptr; }
 
     };
+
+
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc=allocator<rb_tree_node<Value>>>
     class rb_tree {
@@ -165,11 +169,11 @@ namespace mini {
 
         node_ptr &root() const { return nil->parent; }
 
-        node_ptr &left_most() const { return nil->left; }
+        node_ptr &left_most() const { return rb_minimum(root()); }
 
-        node_ptr &right_most() const { return nil->right; }
+        node_ptr &right_most() const { return rb_maximum(root()); }
 
-        static node_ptr &left(node_ptr node) { return node->left; }
+        static node_ptr &left(node_ptr node ) {return node->left; }
 
         static node_ptr &right(node_ptr node) { return node->right; }
 
@@ -201,13 +205,13 @@ namespace mini {
 
         void rb_delete_fixup(node_ptr x);
 
-        node_ptr rb_minimum(node_ptr root) {
+        node_ptr &rb_minimum(node_ptr root) const {
             while (root->left != nil)
                 root = root->left;
             return root;
         }
 
-        node_ptr rb_maximum(node_ptr root) {
+        node_ptr &rb_maximum(node_ptr root) const {
             while (root->right != nil)
                 root = root->right;
             return root;
@@ -237,6 +241,8 @@ namespace mini {
 
 
         void insert_unique(const_reference v);
+
+        void insert_equal(const_reference v);
 
         void erase(node_ptr x);
 
@@ -375,19 +381,6 @@ namespace mini {
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
-    rb_transplant(node_ptr old_node, node_ptr new_node) {
-        if (new_node != nil)
-            new_node->parent = old_node->parent;
-        if (old_node->parent == nil)
-            nil->parent = new_node;
-        else if (old_node == old_node->parent->left)
-            old_node->parent->left = new_node;
-        else
-            old_node->parent->right = new_node;
-    }
-
-    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     insert_unique(const_reference v) { //for map, Value is a pair
         node_ptr new_node = create_node(v);
         color(new_node) = rb_tree_red;
@@ -415,6 +408,25 @@ namespace mini {
         rb_insert_fixup(new_node);
 
         ++node_count;
+    }
+
+    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
+    insert_equal(const_reference v) {
+
+    };
+
+    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
+    rb_transplant(node_ptr old_node, node_ptr new_node) {
+        if (new_node != nil)
+            new_node->parent = old_node->parent;
+        if (old_node->parent == nil)
+            nil->parent = new_node;
+        else if (old_node == old_node->parent->left)
+            old_node->parent->left = new_node;
+        else
+            old_node->parent->right = new_node;
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>

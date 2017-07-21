@@ -12,9 +12,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5f886946-aa5a-4e55-a0c6-54d6c18201a8" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/iterator.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.cpp" afterPath="$PROJECT_DIR$/main.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/rb_tree.h" afterPath="$PROJECT_DIR$/rb_tree.h" />
     </list>
@@ -65,20 +62,19 @@
                   <entry file="file://$PROJECT_DIR$/rb_tree.h">
                     <provider selected="true" editor-type-id="text-editor">
                       <state relative-caret-position="1000">
-                        <caret line="106" column="6" lean-forward="true" selection-start-line="106" selection-start-column="6" selection-end-line="106" selection-end-column="6" />
+                        <caret line="108" column="6" lean-forward="false" selection-start-line="108" selection-start-column="6" selection-end-line="108" selection-end-column="6" />
                         <folding>
                           <element signature="e#101#120#0" expanded="true" />
                           <element signature="e#377#397#0" expanded="true" />
                           <element signature="e#601#646#0" expanded="true" />
-                          <element signature="e#3171#3287#0" expanded="true" />
-                          <element signature="e#8064#8149#0" expanded="true" />
-                          <element signature="e#8667#8752#0" expanded="true" />
-                          <element signature="e#9239#9324#0" expanded="true" />
-                          <element signature="e#9810#9895#0" expanded="true" />
-                          <element signature="e#11653#11738#0" expanded="true" />
-                          <element signature="e#12187#12272#0" expanded="true" />
-                          <element signature="e#13115#13200#0" expanded="true" />
-                          <element signature="e#15705#15790#0" expanded="true" />
+                          <element signature="e#3241#3357#0" expanded="true" />
+                          <element signature="e#8212#8297#0" expanded="true" />
+                          <element signature="e#8815#8900#0" expanded="true" />
+                          <element signature="e#9387#9472#0" expanded="true" />
+                          <element signature="e#9958#10043#0" expanded="true" />
+                          <element signature="e#11801#11886#0" expanded="true" />
+                          <element signature="e#13467#13552#0" expanded="true" />
+                          <element signature="e#16057#16142#0" expanded="true" />
                         </folding>
                       </state>
                     </provider>
@@ -109,21 +105,22 @@
                 <file leaf-file-name="rb_tree.h" pinned="false" current-in-tab="true">
                   <entry file="file://$PROJECT_DIR$/rb_tree.h">
                     <provider selected="true" editor-type-id="text-editor">
-                      <state relative-caret-position="2236">
-                        <caret line="176" column="0" lean-forward="true" selection-start-line="176" selection-start-column="0" selection-end-line="176" selection-end-column="0" />
+                      <state relative-caret-position="702">
+                        <caret line="403" column="32" lean-forward="true" selection-start-line="403" selection-start-column="32" selection-end-line="403" selection-end-column="32" />
                         <folding>
                           <element signature="e#101#120#0" expanded="true" />
                           <element signature="e#377#397#0" expanded="true" />
                           <element signature="e#601#646#0" expanded="true" />
-                          <element signature="e#3171#3287#0" expanded="true" />
-                          <element signature="e#8064#8149#0" expanded="true" />
-                          <element signature="e#8667#8752#0" expanded="true" />
-                          <element signature="e#9239#9324#0" expanded="true" />
-                          <element signature="e#9810#9895#0" expanded="true" />
-                          <element signature="e#11653#11738#0" expanded="true" />
-                          <element signature="e#12187#12272#0" expanded="true" />
-                          <element signature="e#13115#13200#0" expanded="true" />
-                          <element signature="e#15705#15790#0" expanded="true" />
+                          <element signature="e#3241#3357#0" expanded="true" />
+                          <element signature="e#8212#8297#0" expanded="true" />
+                          <element signature="e#8815#8900#0" expanded="true" />
+                          <element signature="e#9387#9472#0" expanded="true" />
+                          <element signature="e#9958#10043#0" expanded="true" />
+                          <element signature="e#11801#11886#0" expanded="true" />
+                          <element signature="e#12729#12814#0" expanded="true" />
+                          <element signature="e#12933#13018#0" expanded="true" />
+                          <element signature="e#13467#13552#0" expanded="true" />
+                          <element signature="e#16057#16142#0" expanded="true" />
                         </folding>
                       </state>
                     </provider>
@@ -172,8 +169,8 @@
           <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/main.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="548">
-                  <caret line="63" column="26" lean-forward="true" selection-start-line="63" selection-start-column="26" selection-end-line="63" selection-end-column="26" />
+                <state relative-caret-position="217">
+                  <caret line="69" column="0" lean-forward="true" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
                   <folding>
                     <element signature="e#0#19#0" expanded="true" />
                     <element signature="e#203#215#0" expanded="true" />
@@ -202,21 +199,22 @@
           <file leaf-file-name="rb_tree.h" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/rb_tree.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="493">
-                  <caret line="105" column="0" lean-forward="true" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
+                <state relative-caret-position="853">
+                  <caret line="168" column="0" lean-forward="true" selection-start-line="168" selection-start-column="0" selection-end-line="168" selection-end-column="0" />
                   <folding>
                     <element signature="e#101#120#0" expanded="true" />
                     <element signature="e#377#397#0" expanded="true" />
                     <element signature="e#601#646#0" expanded="true" />
-                    <element signature="e#3171#3287#0" expanded="true" />
-                    <element signature="e#8064#8149#0" expanded="true" />
-                    <element signature="e#8667#8752#0" expanded="true" />
-                    <element signature="e#9239#9324#0" expanded="true" />
-                    <element signature="e#9810#9895#0" expanded="true" />
-                    <element signature="e#11653#11738#0" expanded="true" />
-                    <element signature="e#12187#12272#0" expanded="true" />
-                    <element signature="e#13115#13200#0" expanded="true" />
-                    <element signature="e#15705#15790#0" expanded="true" />
+                    <element signature="e#3241#3357#0" expanded="true" />
+                    <element signature="e#8212#8297#0" expanded="true" />
+                    <element signature="e#8815#8900#0" expanded="true" />
+                    <element signature="e#9387#9472#0" expanded="true" />
+                    <element signature="e#9958#10043#0" expanded="true" />
+                    <element signature="e#11801#11886#0" expanded="true" />
+                    <element signature="e#12729#12814#0" expanded="true" />
+                    <element signature="e#12933#13018#0" expanded="true" />
+                    <element signature="e#13467#13552#0" expanded="true" />
+                    <element signature="e#16057#16142#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -456,12 +454,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1499936171695</updated>
-      <workItem from="1499936172981" duration="114045000" />
+      <workItem from="1499936172981" duration="116846000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="114045000" />
+    <option name="totallyTimeSpent" value="116846000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -576,8 +574,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/allocator.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="415">
-          <caret line="55" column="0" lean-forward="false" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
+        <state relative-caret-position="760">
+          <caret line="38" column="0" lean-forward="false" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
           <folding>
             <element signature="e#58#76#0" expanded="true" />
             <element signature="e#124#136#0" expanded="true" />
@@ -613,8 +611,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="49" column="23" lean-forward="false" selection-start-line="49" selection-start-column="23" selection-end-line="49" selection-end-column="23" />
+        <state relative-caret-position="217">
+          <caret line="69" column="0" lean-forward="true" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
             <element signature="e#203#215#0" expanded="true" />
@@ -624,21 +622,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/rb_tree.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="105" column="0" lean-forward="true" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
+        <state relative-caret-position="702">
+          <caret line="403" column="32" lean-forward="true" selection-start-line="403" selection-start-column="32" selection-end-line="403" selection-end-column="32" />
           <folding>
             <element signature="e#101#120#0" expanded="true" />
             <element signature="e#377#397#0" expanded="true" />
             <element signature="e#601#646#0" expanded="true" />
-            <element signature="e#3171#3287#0" expanded="true" />
-            <element signature="e#8064#8149#0" expanded="true" />
-            <element signature="e#8667#8752#0" expanded="true" />
-            <element signature="e#9239#9324#0" expanded="true" />
-            <element signature="e#9810#9895#0" expanded="true" />
-            <element signature="e#11653#11738#0" expanded="true" />
-            <element signature="e#12187#12272#0" expanded="true" />
-            <element signature="e#13115#13200#0" expanded="true" />
-            <element signature="e#15705#15790#0" expanded="true" />
+            <element signature="e#3241#3357#0" expanded="true" />
+            <element signature="e#8212#8297#0" expanded="true" />
+            <element signature="e#8815#8900#0" expanded="true" />
+            <element signature="e#9387#9472#0" expanded="true" />
+            <element signature="e#9958#10043#0" expanded="true" />
+            <element signature="e#11801#11886#0" expanded="true" />
+            <element signature="e#12729#12814#0" expanded="true" />
+            <element signature="e#12933#13018#0" expanded="true" />
+            <element signature="e#13467#13552#0" expanded="true" />
+            <element signature="e#16057#16142#0" expanded="true" />
           </folding>
         </state>
       </provider>
