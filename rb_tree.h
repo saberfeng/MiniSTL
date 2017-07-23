@@ -108,6 +108,15 @@ namespace mini {
 
     };
 
+    inline bool operator==(const rb_tree_iterator &x,
+                           const rb_tree_iterator &y) {
+        return x.node == y.node;
+    }
+
+    inline bool operator!=(const rb_tree_iterator &x,
+                           const rb_tree_iterator &y) {
+        return x.node != y.node;
+    }
 
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc=allocator<rb_tree_node<Value>>>
@@ -244,9 +253,15 @@ namespace mini {
 
         void insert_equal(const_reference v);
 
+        iterator _insert(node_ptr x , node_ptr y,const_reference v);
+
         void erase(node_ptr x);
 
         node_ptr find(const Key &key);
+
+        iterator begin(){return iterator(left_most());}
+
+        iterator end(){return iterator(nil);}
 
         //--------------------------for Debugging----------------------------
         void DebugMidorderTraverseCore(node_ptr node) {
@@ -381,7 +396,7 @@ namespace mini {
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
-    insert_unique(const_reference v) { //for map, Value is a pair
+    insert_equal(const_reference v) { //for map, Value is a pair
         node_ptr new_node = create_node(v);
         color(new_node) = rb_tree_red;
 
@@ -409,6 +424,48 @@ namespace mini {
 
         ++node_count;
     }
+
+    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
+    insert_unique(const_reference v) {
+        node_ptr y=nil;
+        node_ptr x=root();
+        bool comp = true;
+
+        while(x!=nil){
+            y=x;
+            comp=key_compare(KeyOfValue()(v),key(x));
+            x=comp?x->left:x->right;
+        }
+        iterator j=iterator(y);
+        if(comp)
+            if(j==begin())
+                _insert(x,y,v);
+            else
+                --j;
+
+
+    }
+
+    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+    typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
+    _insert(node_ptr insert_position,node_ptr parent,const_reference v) {
+        node_ptr new_node = create_node(v);
+        new_node->color=rb_tree_red;
+        new_node->left=nil;
+        new_node->right=nil;
+
+        new_node->parent=parent;
+        if(parent==nil)
+            nil->parent=new_node;
+        else if(insert_position == parent->left)
+            parent->left=new_node;
+        else
+            parent->right=new_node;
+
+        rb_insert_fixup(new_node);
+
+    };
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
