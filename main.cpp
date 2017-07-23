@@ -39,7 +39,7 @@ void TestRBTree() {
     mini::rb_tree<int, int, identity<int>, std::less<int>> tree;
     cout << "before insert size: " << tree.size() << endl;
 
-    std::vector<int> input = {10, 7, 8, 15, 5, 6, 11,11,11,11, 13, 12, 8,20, 14, 16};
+    std::vector<int> input = {10, 7, 8, 15, 5, 6, 11, 11, 11, 11, 13, 12, 8, 20, 14, 16};
 
     for (auto &i:input)
         tree.insert_equal(i);
@@ -76,7 +76,6 @@ void TestRBTree() {
         cout << "erase " << i << ": " << endl;
         tree.DebugMidorderTraverse();
     }
-
 
 
 }
