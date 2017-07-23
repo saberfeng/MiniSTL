@@ -11,10 +11,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5f886946-aa5a-4e55-a0c6-54d6c18201a8" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.cpp" afterPath="$PROJECT_DIR$/main.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/rb_tree.h" afterPath="$PROJECT_DIR$/rb_tree.h" />
-    </list>
+    <list default="true" id="5f886946-aa5a-4e55-a0c6-54d6c18201a8" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -33,7 +30,7 @@
                 <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
                   <entry file="file://$PROJECT_DIR$/main.cpp">
                     <provider selected="true" editor-type-id="text-editor">
-                      <state relative-caret-position="532">
+                      <state relative-caret-position="361">
                         <caret line="68" column="0" lean-forward="false" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
                         <folding>
                           <element signature="e#0#19#0" expanded="true" />
@@ -105,8 +102,8 @@
                 <file leaf-file-name="rb_tree.h" pinned="false" current-in-tab="true">
                   <entry file="file://$PROJECT_DIR$/rb_tree.h">
                     <provider selected="true" editor-type-id="text-editor">
-                      <state relative-caret-position="702">
-                        <caret line="403" column="32" lean-forward="true" selection-start-line="403" selection-start-column="32" selection-end-line="403" selection-end-column="32" />
+                      <state relative-caret-position="362">
+                        <caret line="386" column="0" lean-forward="true" selection-start-line="386" selection-start-column="0" selection-end-line="386" selection-end-column="0" />
                         <folding>
                           <element signature="e#101#120#0" expanded="true" />
                           <element signature="e#377#397#0" expanded="true" />
@@ -454,12 +451,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1499936171695</updated>
-      <workItem from="1499936172981" duration="116846000" />
+      <workItem from="1499936172981" duration="116986000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="116846000" />
+    <option name="totallyTimeSpent" value="116986000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -622,8 +619,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/rb_tree.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="702">
-          <caret line="403" column="32" lean-forward="true" selection-start-line="403" selection-start-column="32" selection-end-line="403" selection-end-column="32" />
+        <state relative-caret-position="362">
+          <caret line="386" column="0" lean-forward="true" selection-start-line="386" selection-start-column="0" selection-end-line="386" selection-end-column="0" />
           <folding>
             <element signature="e#101#120#0" expanded="true" />
             <element signature="e#377#397#0" expanded="true" />
