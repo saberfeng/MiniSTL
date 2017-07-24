@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include "allocator.h"
 #include "rb_tree.h"
+#include "set.h"
 
 using std::cout;
 using std::endl;
@@ -42,7 +43,7 @@ void TestRBTree() {
     std::vector<int> input = {10, 7, 8, 15, 5, 6, 11, 11, 11, 11, 13, 12, 8, 20, 14, 16};
 
     for (auto &i:input)
-        tree1.insert_equal(i);
+        tree1.insert_unique(i);
 
     mini::rb_tree<int, int, identity<int>, std::less<int>> tree(tree1);
 
@@ -69,7 +70,6 @@ void TestRBTree() {
     }
     cout << endl;
 
-
     std::vector<int> vec = {10, 6, 16, 14, 12, 11, 13, 5, 7, 8, 15, 20};
 
     for (auto &i : vec) {
@@ -79,14 +79,22 @@ void TestRBTree() {
         tree.DebugMidorderTraverse();
     }
 
-
 }
 
+void TestSet(){
+    mini::set<int> s;
+    s.insert({10, 7, 8, 15, 5, 6, 11, 11, 11, 11, 13, 12, 8, 20, 14, 16});
+    mini::set<int>::iterator iter=s.begin();
+    while(iter!=s.end())
+        cout<<*iter++<<" ";
+    cout<<endl;
+}
 
 int main() {
 
     //TestAllocator();
     TestRBTree();
+    TestSet();
 
     return 0;
 }
