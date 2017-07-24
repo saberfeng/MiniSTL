@@ -247,9 +247,9 @@ namespace mini {
             return tmp_nil;
         }
 
-        void copy_tree(node_ptr other_root,node_ptr my_nil);
+        void copy_tree(const rb_tree &other);
 
-        node_ptr copy_tree_core(node_ptr node);
+        node_ptr copy_tree_core(node_ptr other_node,node_ptr other_nil);
 
     public:
         rb_tree(Compare comp = Compare()) : node_count(0), key_compare(comp) { init(); }
@@ -258,7 +258,7 @@ namespace mini {
             if(other.root()==other.nil) // then "other" is an empty tree
                 return;
             node_count=other.node_count;
-            copy_tree(other.root(),nil);
+            copy_tree(other);
         }
 
         ~rb_tree() {
@@ -345,20 +345,20 @@ namespace mini {
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
-    copy_tree(node_ptr other_root,node_ptr my_nil){
-        node_ptr my_top = copy_tree_core(other_root);
+    copy_tree(const rb_tree &other){
+        node_ptr my_top = copy_tree_core(other.root(),other.nil);
         my_top->parent=nil;
         nil->parent=my_top;
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::node_ptr rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
-    copy_tree_core(node_ptr node){
-        if(node==nil)
+    copy_tree_core(node_ptr other_node,node_ptr other_nil){
+        if(other_node==other_nil)
             return nil;
-        node_ptr copy=clone_node(node);
-        node_ptr left=copy_tree_core(node->left);
-        node_ptr right=copy_tree_core(node->right);
+        node_ptr copy=clone_node(other_node);
+        node_ptr left=copy_tree_core(other_node->left,other_nil);
+        node_ptr right=copy_tree_core(other_node->right,other_nil);
         copy->left=left;
         copy->right=right;
         if(left!=nil)
@@ -459,11 +459,13 @@ namespace mini {
             x = comp ? x->left : x->right;
         }
         iterator j = iterator(y);
-        if (comp)
-            if (j == begin())
+        if (comp){
+            if (j == begin()){
                 return std::pair<iterator, bool>(_insert(x, y, v), true);
-            else
+            } else{
                 --j;
+            }
+        }
         if (key_compare(key(j.node), KeyOfValue()(v)))
             return std::pair<iterator, bool>(_insert(x, y, v), true);
         return std::pair<iterator, bool>(j, false);
