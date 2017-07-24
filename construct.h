@@ -10,7 +10,7 @@ void construct(T1 *pointer, const T2 &value) {
 
 template<typename T>
 void destroy(T *pointer){
-    ~T();
+    pointer->~T();
 }
 
 

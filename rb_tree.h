@@ -43,7 +43,7 @@ namespace mini {
 
         rb_tree_iterator(node_ptr ptr) { node = ptr; }
 
-        rb_tree_iterator(iterator i) { node = i.node; }
+        rb_tree_iterator(const iterator &i) { node = i.node; }
 
         Reference operator*() const { return node->value; }
 
@@ -169,6 +169,7 @@ namespace mini {
             clone->left = nullptr;
             clone->right = nullptr;
             clone->parent = nullptr;
+            return clone;
         }
 
         void destroy_node(node_ptr node) {
@@ -246,9 +247,19 @@ namespace mini {
             return tmp_nil;
         }
 
+        void copy_tree(node_ptr other_root,node_ptr my_nil);
+
+        node_ptr copy_tree_core(node_ptr node);
+
     public:
         rb_tree(Compare comp = Compare()) : node_count(0), key_compare(comp) { init(); }
-        rb_tree(const rb_tree& other);
+        rb_tree(const rb_tree& other){
+            init();
+            if(other.root()==other.nil) // then "other" is an empty tree
+                return;
+            node_count=other.node_count;
+            copy_tree(other.root(),nil);
+        }
 
         ~rb_tree() {
             clear();
@@ -333,6 +344,31 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+    void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
+    copy_tree(node_ptr other_root,node_ptr my_nil){
+        node_ptr my_top = copy_tree_core(other_root);
+        my_top->parent=nil;
+        nil->parent=my_top;
+    }
+
+    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+    typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::node_ptr rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
+    copy_tree_core(node_ptr node){
+        if(node==nil)
+            return nil;
+        node_ptr copy=clone_node(node);
+        node_ptr left=copy_tree_core(node->left);
+        node_ptr right=copy_tree_core(node->right);
+        copy->left=left;
+        copy->right=right;
+        if(left!=nil)
+            left->parent=copy;
+        if(right!=nil)
+            right->parent=copy;
+        return copy;
+    }
+
+            template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     rb_left_rotate(node_ptr x) {
         node_ptr y = x->right;
