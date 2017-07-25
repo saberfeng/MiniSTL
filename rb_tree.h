@@ -11,8 +11,10 @@
 #include "construct.h"
 #include "iterator.h"
 #include "util.h"
+#include "algorithm.h"
 #include <memory>
 #include <utility>
+#include <iomanip>
 
 namespace mini {
 
@@ -31,7 +33,7 @@ namespace mini {
     };
 
     template<class Value, class Reference, class Pointer>
-    class rb_tree_iterator : iterator_base<bidirectional_iterator_tag, Value, ptrdiff_t, Pointer, Reference> {
+    class rb_tree_iterator : public iterator_base<bidirectional_iterator_tag, Value, ptrdiff_t, Pointer, Reference> {
     public:
         typedef rb_tree_node<Value> *node_ptr;
         typedef rb_tree_iterator<Value, Value &, Value *> iterator;
@@ -273,23 +275,23 @@ namespace mini {
 
         bool empty() { return node_count == 0; }
 
-        void swap(rb_tree &other){
-            if(root()==nil && other.root()==other.nil)
+        void swap(rb_tree &other) {
+            if (root() == nil && other.root() == other.nil)
                 return;
-            else if(root()==nil){
-                nil->parent=other.root();
-                other.root()->parent=nil;
-                other.nil->parent=other.nil;
-            }else if(other.root()==other.nil){
-                other.nil->parent=root();
-                root()->parent=other.nil;
-                nil->parent=nil;
-            }else{
+            else if (root() == nil) {
+                nil->parent = other.root();
+                other.root()->parent = nil;
+                other.nil->parent = other.nil;
+            } else if (other.root() == other.nil) {
+                other.nil->parent = root();
+                root()->parent = other.nil;
+                nil->parent = nil;
+            } else {
                 node_ptr tmp = other.root();
-                other.nil->parent=root();
-                root()->parent=other.nil;
-                nil->parent=tmp;
-                tmp->parent=nil;
+                other.nil->parent = root();
+                root()->parent = other.nil;
+                nil->parent = tmp;
+                tmp->parent = nil;
             }
         }
 
@@ -301,7 +303,7 @@ namespace mini {
 
         void insert_equal(const_iterator i, const_iterator j);
 
-        iterator insert(const_iterator hint,const_reference v);
+        iterator insert(const_iterator hint, const_reference v);
 
         iterator _insert(node_ptr insert_position, node_ptr parent, const_reference v);
 
@@ -317,16 +319,20 @@ namespace mini {
 
         iterator end() { return iterator(nil); }
 
+        const_iterator cbegin() const { return const_iterator(left_most()); }
+
+        const_iterator cend() const { return const_iterator(nil); }
+
         iterator lower_bound(const_reference k) const;
 
         iterator upper_bound(const_reference k) const;
 
-        std::pair<iterator,iterator> equal_range(const_reference k) const;
+        std::pair<iterator, iterator> equal_range(const_reference k) const;
 
-        size_type count(const_reference k) const{
-            iterator start=lower_bound(k);
-            iterator end=upper_bound(k);
-            return distance(start,end);
+        size_type count(const_reference k) const {
+            iterator start = lower_bound(k);
+            iterator end = upper_bound(k);
+            return distance(start, end);
         }
 
         //--------------------------for Debugging----------------------------
@@ -359,6 +365,41 @@ namespace mini {
         rb_tree_color_type DebugGetColor(node_ptr node) { return node->color; }
 
         reference DebugGetValue(node_ptr node) { return node->value; }
+
+        void PrintTree() {
+            PrintSubTree(root(), 0);
+        }
+
+        void PrintSubTree(node_ptr node, int indent) {
+            if (node != nil) {
+                if (node->right != nil)
+                    PrintSubTree(node->right, indent + 4);
+                if (indent)
+                    std::cout << std::setw(indent) << ' ';
+                if (node->right != nil)
+                    std::cout << " /\n" << std::setw(indent) << ' ';
+
+                if(node->color==rb_tree_black)
+                    std::cout<<"B";
+                else
+                    std::cout<<"R";
+                std::cout << node->value << "\n";
+
+                if (node->left != nil) {
+                    std::cout << std::setw(indent) << ' ' << " \\\n";
+                    PrintSubTree(node->left, indent + 4);
+                }
+            }
+        }
+
+        void Debug_erase(iterator first,iterator last){
+            while(first!=last){
+                erase(first);
+                std::cout<<"erase "<<*first<<"-----------------------------"<<std::endl;
+                ++first;
+                PrintTree();
+            }
+        }
         //--------------------------------------------------------------------
 
     };
@@ -410,18 +451,18 @@ namespace mini {
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     lower_bound(const_reference k) const {
-        node_ptr bound=nil;
-        node_ptr node=root();
+        node_ptr bound = nil;
+        node_ptr node = root();
 
         // if node with value k exists,bound point to first k node
         // if node with value k doesn't exists,bound point to first node bigger than k
         // Above all , bound point to first node which is not less than k
-        while(node!=nil){
-            if(!key_compare(key(node),k)){
-                bound=node;
-                node=node->left;
-            }else
-                node=node->right;
+        while (node != nil) {
+            if (!key_compare(key(node), k)) {
+                bound = node;
+                node = node->left;
+            } else
+                node = node->right;
         }
 
         return iterator(bound);
@@ -430,28 +471,28 @@ namespace mini {
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     upper_bound(const_reference k) const {
-        node_ptr bound =nil;
-        node_ptr node=root();
+        node_ptr bound = nil;
+        node_ptr node = root();
 
-        while(node!=nil){
-            if(key_compare(k,key(node))){
-                bound=node;
-                node=node->left;
-            }else
-                node=node->right;
+        while (node != nil) {
+            if (key_compare(k, key(node))) {
+                bound = node;
+                node = node->left;
+            } else
+                node = node->right;
         }
         return iterator(bound);
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    std::pair<typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator,typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator>
+    std::pair<typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator, typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator>
     rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     equal_range(const_reference k) const {
-        return std::pair<iterator,iterator>(lower_bound(k),upper_bound(k));
+        return std::pair<iterator, iterator>(lower_bound(k), upper_bound(k));
     }
 
 
-            template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     rb_left_rotate(node_ptr x) {
         node_ptr y = x->right;
@@ -594,11 +635,11 @@ namespace mini {
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
-    insert(const_iterator hint,const_reference v){
-        return _insert(hint.node->left,hint.node,v);
+    insert(const_iterator hint, const_reference v) {
+        return _insert(hint.node->left, hint.node, v);
     }
 
-            template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     rb_insert_fixup(node_ptr node) {
         while (node->parent->color == rb_tree_red) {
@@ -707,6 +748,7 @@ namespace mini {
                     w->left->color = rb_tree_black;
                     rb_right_rotate(x->parent);
 
+                    x = root();
                 }
             }
         }
@@ -715,7 +757,7 @@ namespace mini {
             //put_node(old_x);
             destroy_node(old_x);
         }
-        x = root();
+
         x->color = rb_tree_black;
     }
 
@@ -778,6 +820,18 @@ namespace mini {
     erase(const_iterator i, const_iterator j) {
         while (i != j)
             erase(i++.node);
+    }
+
+    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+    bool operator==(rb_tree<Key, Value, KeyOfValue, Compare, Alloc> tree1,
+                    rb_tree<Key, Value, KeyOfValue, Compare, Alloc> tree2) {
+        return (tree1.size() == tree2.size() && equal(tree1.begin(), tree1.end(), tree1.begin()));
+    }
+
+    template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+    bool operator<(rb_tree<Key, Value, KeyOfValue, Compare, Alloc> tree1,
+                   rb_tree<Key, Value, KeyOfValue, Compare, Alloc> tree2) {
+        return lexicographical_compare(tree1.begin(), tree1.end(), tree2.begin(), tree2.end());
     }
 
 }

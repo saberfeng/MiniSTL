@@ -72,29 +72,76 @@ void TestRBTree() {
 
     std::vector<int> vec = {10, 6, 16, 14, 12, 11, 13, 5, 7, 8, 15, 20};
 
+    /*
     for (auto &i : vec) {
         node = tree.find(i);
         tree.erase(node);
         cout << "erase " << i << ": " << endl;
         tree.DebugMidorderTraverse();
     }
+    */
+
+
 
 }
 
-void TestSet(){
-    mini::set<int> s;
+template<class T>
+void PrintSet(const mini::set<T> &s) {
+    typename mini::set<T>::iterator iter = s.cbegin();
+    while (iter != s.cend())
+        cout << *iter++ << " ";
+    cout << endl;
+}
+
+void TestSet() {
+
+    typedef mini::set<int> int_set;
+    typedef typename int_set::iterator iterator;
+
+    int_set s;
     s.insert({10, 7, 8, 15, 5, 6, 11, 11, 11, 11, 13, 12, 8, 20, 14, 16});
-    mini::set<int>::iterator iter=s.begin();
-    while(iter!=s.end())
-        cout<<*iter++<<" ";
-    cout<<endl;
+    PrintSet(s);
+
+    iterator iter = s.find(12);
+    s.erase(iter);
+    PrintSet(s);
+
+    iterator begin = s.find(5);
+    iterator end = s.find(13);
+    s.erase(begin, end);
+    PrintSet(s);
+
+    cout << s.count(16) << endl;
+
+
+}
+
+void TestPrintTree(){
+    typedef mini::rb_tree<int, int, identity<int>, std::less<int>> tree;
+    typedef typename tree::iterator iterator;
+    tree t;
+
+    std::vector<int> input = {10, 7, 8, 15, 5, 6, 11, 11, 11, 11, 13, 12, 8, 20, 14, 16};
+
+    for (auto &i:input)
+        t.insert_unique(i);
+
+    cout<<"before erase:"<<endl;
+    t.PrintTree();
+
+    iterator first=t.find(5);
+    iterator last=t.find(13);
+    t.Debug_erase(first,last);
+
+    //
 }
 
 int main() {
 
     //TestAllocator();
-    TestRBTree();
+    //TestRBTree();
     TestSet();
+    //TestPrintTree();
 
     return 0;
 }

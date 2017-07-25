@@ -55,11 +55,11 @@ namespace mini {
 
         iterator begin() { return tree.begin(); }
 
-        const_iterator cbegin() { return tree.begin(); }
+        const_iterator cbegin() const { return tree.cbegin(); }
 
         iterator end() { return tree.end(); }
 
-        const_iterator cend() { return tree.end(); }
+        const_iterator cend()  const { return tree.cend(); }
 
         void clear() { tree.clear(); }
 
@@ -110,14 +110,13 @@ namespace mini {
 
         tree_type tree;
 
-
     };
 
 
     //TODO: equal lexicographical_compare
     template<class Key, class Compare, class Allocator>
     bool operator==(set<Key, Compare, Allocator> set1, set<Key, Compare, Allocator> set2) {
-
+        return set1.tree == set2.tree;
     }
 
     template<class Key, class Compare, class Allocator>
@@ -127,7 +126,7 @@ namespace mini {
 
     template<class Key, class Compare, class Allocator>
     bool operator<(set<Key, Compare, Allocator> set1, set<Key, Compare, Allocator> set2) {
-
+        return set1.tree < set2.tree;
     }
 
     template<class Key, class Compare, class Allocator>
