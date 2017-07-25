@@ -271,7 +271,7 @@ namespace mini {
             erase(begin(), end());
         }
 
-        size_type size() { return node_count; }
+        size_type size() const { return node_count; }
 
         bool empty() { return node_count == 0; }
 
@@ -379,10 +379,10 @@ namespace mini {
                 if (node->right != nil)
                     std::cout << " /\n" << std::setw(indent) << ' ';
 
-                if(node->color==rb_tree_black)
-                    std::cout<<"B";
+                if (node->color == rb_tree_black)
+                    std::cout << "B";
                 else
-                    std::cout<<"R";
+                    std::cout << "R";
                 std::cout << node->value << "\n";
 
                 if (node->left != nil) {
@@ -392,10 +392,10 @@ namespace mini {
             }
         }
 
-        void Debug_erase(iterator first,iterator last){
-            while(first!=last){
+        void Debug_erase(iterator first, iterator last) {
+            while (first != last) {
                 erase(first);
-                std::cout<<"erase "<<*first<<"-----------------------------"<<std::endl;
+                std::cout << "erase " << *first << "-----------------------------" << std::endl;
                 ++first;
                 PrintTree();
             }
@@ -823,15 +823,15 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    bool operator==(rb_tree<Key, Value, KeyOfValue, Compare, Alloc> tree1,
-                    rb_tree<Key, Value, KeyOfValue, Compare, Alloc> tree2) {
-        return (tree1.size() == tree2.size() && equal(tree1.begin(), tree1.end(), tree1.begin()));
+    bool operator==(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc> &tree1,
+                    const rb_tree<Key, Value, KeyOfValue, Compare, Alloc> &tree2) {
+        return (tree1.size() == tree2.size() && equal(tree1.cbegin(), tree1.cend(), tree1.cbegin()));
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    bool operator<(rb_tree<Key, Value, KeyOfValue, Compare, Alloc> tree1,
-                   rb_tree<Key, Value, KeyOfValue, Compare, Alloc> tree2) {
-        return lexicographical_compare(tree1.begin(), tree1.end(), tree2.begin(), tree2.end());
+    bool operator<(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc> &tree1,
+                   const rb_tree<Key, Value, KeyOfValue, Compare, Alloc> &tree2) {
+        return lexicographical_compare(tree1.cbegin(), tree1.cend(), tree2.cbegin(), tree2.cend());
     }
 
 }

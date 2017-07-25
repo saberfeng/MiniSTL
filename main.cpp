@@ -113,10 +113,15 @@ void TestSet() {
 
     cout << s.count(16) << endl;
 
+    int_set s2;
+    s2.insert({13, 14});
+    cout << "s2 < s:" << ((s2 < s) ? "true" : "false") << endl
+         << "s2 == s:" << ((s2 == s) ? "true" : "false") << endl;
+
 
 }
 
-void TestPrintTree(){
+void TestPrintTree() {
     typedef mini::rb_tree<int, int, identity<int>, std::less<int>> tree;
     typedef typename tree::iterator iterator;
     tree t;
@@ -126,12 +131,12 @@ void TestPrintTree(){
     for (auto &i:input)
         t.insert_unique(i);
 
-    cout<<"before erase:"<<endl;
+    cout << "before erase:" << endl;
     t.PrintTree();
 
-    iterator first=t.find(5);
-    iterator last=t.find(13);
-    t.Debug_erase(first,last);
+    iterator first = t.find(5);
+    iterator last = t.find(13);
+    t.Debug_erase(first, last);
 
     //
 }

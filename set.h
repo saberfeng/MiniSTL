@@ -15,6 +15,15 @@ namespace mini {
         const T &operator()(const T &x) { return x; }
     };
 
+    template<class Key, class Compare, class Allocator>
+    class set;
+
+    template<class Key, class Compare, class Allocator>
+    bool operator==(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2);
+
+    template<class Key, class Compare, class Allocator>
+    bool operator<(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2);
+
     template<class Key, class Compare = std::less<Key>, class Allocator =allocator <rb_tree_node<Key>>>
     class set {
 
@@ -110,37 +119,41 @@ namespace mini {
 
         tree_type tree;
 
+        friend bool operator==<Key,Compare,Allocator>(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2);
+
+        friend bool operator< <Key,Compare,Allocator>(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2);
+
     };
 
 
     //TODO: equal lexicographical_compare
     template<class Key, class Compare, class Allocator>
-    bool operator==(set<Key, Compare, Allocator> set1, set<Key, Compare, Allocator> set2) {
+    bool operator==(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2) {
         return set1.tree == set2.tree;
     }
 
     template<class Key, class Compare, class Allocator>
-    bool operator!=(set<Key, Compare, Allocator> set1, set<Key, Compare, Allocator> set2) {
+    bool operator!=(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2) {
         return !(set1 == set2);
     }
 
     template<class Key, class Compare, class Allocator>
-    bool operator<(set<Key, Compare, Allocator> set1, set<Key, Compare, Allocator> set2) {
+    bool operator<(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2) {
         return set1.tree < set2.tree;
     }
 
     template<class Key, class Compare, class Allocator>
-    bool operator<=(set<Key, Compare, Allocator> set1, set<Key, Compare, Allocator> set2) {
+    bool operator<=(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2) {
         return !(set2 < set1);
     }
 
     template<class Key, class Compare, class Allocator>
-    bool operator>(set<Key, Compare, Allocator> set1, set<Key, Compare, Allocator> set2) {
+    bool operator>(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2) {
         return !(set1 <= set2);
     }
 
     template<class Key, class Compare, class Allocator>
-    bool operator>=(set<Key, Compare, Allocator> set1, set<Key, Compare, Allocator> set2) {
+    bool operator>=(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2) {
         return !(set1 < set2);
     }
 
