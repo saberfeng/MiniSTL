@@ -262,6 +262,15 @@ namespace mini {
             copy_tree(other);
         }
 
+        rb_tree& operator=(const rb_tree &other){
+            clear();
+            if(other.root()==other.nil)
+                return *this;
+            node_count=other.node_count;
+            copy_tree(other);
+            return *this;
+        }
+
         ~rb_tree() {
             clear();
             destroy_node(nil);
@@ -295,7 +304,7 @@ namespace mini {
             }
         }
 
-        std::pair<iterator, bool> insert_unique(const_reference v);
+        pair<iterator, bool> insert_unique(const_reference v);
 
         void insert_unique(const_iterator i, const_iterator j);
 
@@ -313,6 +322,8 @@ namespace mini {
 
         void erase(const_iterator i, const_iterator j);
 
+        size_type erase(const Key &key);
+
         iterator find(const Key &key) const;
 
         iterator begin() { return iterator(left_most()); }
@@ -323,13 +334,13 @@ namespace mini {
 
         const_iterator cend() const { return const_iterator(nil); }
 
-        iterator lower_bound(const_reference k) const;
+        iterator lower_bound(const Key &k) const;
 
-        iterator upper_bound(const_reference k) const;
+        iterator upper_bound(const Key &k) const;
 
-        std::pair<iterator, iterator> equal_range(const_reference k) const;
+        pair<iterator, iterator> equal_range(const Key &k) const;
 
-        size_type count(const_reference k) const {
+        size_type count(const Key &k) const {
             iterator start = lower_bound(k);
             iterator end = upper_bound(k);
             return distance(start, end);
@@ -450,7 +461,7 @@ namespace mini {
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
-    lower_bound(const_reference k) const {
+    lower_bound(const Key &k) const {
         node_ptr bound = nil;
         node_ptr node = root();
 
@@ -470,7 +481,7 @@ namespace mini {
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
-    upper_bound(const_reference k) const {
+    upper_bound(const Key &k) const {
         node_ptr bound = nil;
         node_ptr node = root();
 
@@ -485,10 +496,10 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    std::pair<typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator, typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator>
+    pair<typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator, typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator>
     rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
-    equal_range(const_reference k) const {
-        return std::pair<iterator, iterator>(lower_bound(k), upper_bound(k));
+    equal_range(const Key &k) const {
+        return pair<iterator, iterator>(lower_bound(k), upper_bound(k));
     }
 
 
@@ -570,7 +581,7 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    std::pair<typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator, bool>
+    pair<typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator, bool>
     rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     insert_unique(const_reference v) {
         node_ptr y = nil;
@@ -585,14 +596,14 @@ namespace mini {
         iterator j = iterator(y);
         if (comp) {
             if (j == begin()) {
-                return std::pair<iterator, bool>(_insert(x, y, v), true);
+                return pair<iterator, bool>(_insert(x, y, v), true);
             } else {
                 --j;
             }
         }
         if (key_compare(key(j.node), KeyOfValue()(v)))
-            return std::pair<iterator, bool>(_insert(x, y, v), true);
-        return std::pair<iterator, bool>(j, false);
+            return pair<iterator, bool>(_insert(x, y, v), true);
+        return pair<iterator, bool>(j, false);
 
     }
 
@@ -823,6 +834,19 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+    size_type rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
+    erase(const Key &key){
+        size_type count = 0;
+        iterator iter = find(key);
+        while (iter != end()) {
+            ++count;
+            erase(iter);
+            iter = find(key);
+        }
+        return count;
+    }
+
+            template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
     bool operator==(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc> &tree1,
                     const rb_tree<Key, Value, KeyOfValue, Compare, Alloc> &tree2) {
         return (tree1.size() == tree2.size() && equal(tree1.cbegin(), tree1.cend(), tree1.cbegin()));

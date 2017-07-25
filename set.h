@@ -7,6 +7,7 @@
 
 #include "allocator.h"
 #include "rb_tree.h"
+#include "util.h"
 
 namespace mini {
 
@@ -62,6 +63,11 @@ namespace mini {
                 tree.insert_unique(item);
         }
 
+        set& operator=(const set &other){
+            tree=other.tree;
+            return *this;
+        }
+
         iterator begin() { return tree.begin(); }
 
         const_iterator cbegin() const { return tree.cbegin(); }
@@ -72,7 +78,7 @@ namespace mini {
 
         void clear() { tree.clear(); }
 
-        std::pair<iterator, bool> insert(const_reference value) { return tree.insert_unique(value); };
+        mini::pair<iterator,bool> insert(const_reference value) { return tree.insert_unique(value); };
 
         iterator insert(iterator hint, const_reference value) { return tree.insert(hint, value); }
 
@@ -90,16 +96,7 @@ namespace mini {
 
         void erase(iterator first, iterator last) { tree.erase(first, last); }
 
-        size_type erase(const_reference key) {
-            size_type count = 0;
-            iterator iter = tree.find(key);
-            while (iter != tree.end()) {
-                ++count;
-                tree.erase(iter);
-                iter = tree.find(key);
-            }
-            return count;
-        }
+        size_type erase(const_reference key) {return tree.erase(key);}
 
         void swap(set &other) {
             tree.swap(other.tree);
@@ -109,7 +106,7 @@ namespace mini {
 
         const_iterator find(const_reference k) const { return tree.find(k); }
 
-        std::pair<iterator, iterator> equal_range(const_reference k) const { return tree.equal_range(k); }
+        pair<iterator, iterator> equal_range(const_reference k) const { return tree.equal_range(k); }
 
         key_compare key_comp() const { return key_compare(); }
 
