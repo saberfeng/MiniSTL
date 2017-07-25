@@ -9,30 +9,55 @@
 
 namespace mini {
 
+    template<class T1, class T2>
+    struct pair {
+        typedef T1 first_type;
+        typedef T2 second_type;
+        first_type first;
+        second_type second;
 
-    template<class InputIterator>
-    inline typename iterator_traits<InputIterator>::difference_type
-    _distance(InputIterator first, InputIterator last, input_iterator_tag) {
-        typename iterator_traits<InputIterator>::difference_type count = 0;
-        while (first != last) {
-            ++first;
-            ++count;
-        }
-        return count;
+        pair() : first(first_type()), second(second_type()) {}
+
+        pair(const first_type &a, const second_type &b) : first(a), second(b) {}
+
+        template<class U1, class U2>
+        pair(const pair<U1, U2> &p):first(p.first), second(p.second) {}
+    };
+
+    template<class T1, class T2>
+    bool operator==(const pair<T1, T2> &p1, const pair<T1, T2> &p2) {
+        return (p1.first == p2.first && p1.second == p2.second);
     }
 
-    template<class RandomAccessIterator>
-    inline typename iterator_traits<RandomAccessIterator>::difference_type
-    _distance(RandomAccessIterator first, RandomAccessIterator last, random_access_iterator_tag) {
-        return last - first;
+    template<class T1, class T2>
+    bool operator<(const pair<T1, T2> &p1, const pair<T1, T2> &p2) {
+        return p1.first < p2.first || (!(p2.first < p1.first) && p1.second < p2.second);
     }
 
-    template<class InputIterator>
-    inline typename iterator_traits<InputIterator>::difference_type
-    distance(InputIterator first, InputIterator last) {
-        return _distance(first, last, typename iterator_traits<InputIterator>::iterator_category());
+    template<class T1, class T2>
+    bool operator!=(const pair<T1, T2> &p1, const pair<T1, T2> &p2) {
+        return !(p1 == p2);
+    };
+
+    template<class T1, class T2>
+    bool operator<=(const pair<T1, T2> &p1, const pair<T1, T2> &p2) {
+        return !(p2 < p1);
     }
 
+    template<class T1, class T2>
+    bool operator>(const pair<T1, T2> &p1, const pair<T1, T2> &p2) {
+        return p2 < p1;
+    }
+
+    template<class T1, class T2>
+    bool operator>=(const pair<T1, T2> &p1, const pair<T1, T2> &p2) {
+        return !(p1 < p2);
+    }
+
+    template <class T1,class T2>
+    pair<T1,T2> make_pair(T1 first,T2 last){
+        return pair<T1,T2>(first,last);
+    };
 
 }
 

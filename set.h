@@ -68,7 +68,7 @@ namespace mini {
 
         iterator end() { return tree.end(); }
 
-        const_iterator cend()  const { return tree.cend(); }
+        const_iterator cend() const { return tree.cend(); }
 
         void clear() { tree.clear(); }
 
@@ -119,9 +119,12 @@ namespace mini {
 
         tree_type tree;
 
-        friend bool operator==<Key,Compare,Allocator>(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2);
+        friend bool operator==<Key, Compare, Allocator>(const set<Key, Compare, Allocator> &set1,
+                                                        const set<Key, Compare, Allocator> &set2);
 
-        friend bool operator< <Key,Compare,Allocator>(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2);
+        //warning: if "operator<<Key,Compare,Allocator>....." ,syntax error occurs.
+        friend bool operator<  <Key, Compare, Allocator>(const set<Key, Compare, Allocator> &set1,
+                                                       const set<Key, Compare, Allocator> &set2);
 
     };
 
@@ -149,7 +152,7 @@ namespace mini {
 
     template<class Key, class Compare, class Allocator>
     bool operator>(const set<Key, Compare, Allocator> &set1, const set<Key, Compare, Allocator> &set2) {
-        return !(set1 <= set2);
+        return set2 < set1;
     }
 
     template<class Key, class Compare, class Allocator>
