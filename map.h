@@ -11,6 +11,15 @@
 
 namespace mini {
 
+    template <class Key,class Mapped,class Compare,class Allocator>
+    bool operator==(const map<Key,Mapped,Compare,Allocator> &lhs,
+                    const map<Key,Mapped,Compare,Allocator> &rhs);
+
+    template <class Key,class Mapped,class Compare,class Allocator>
+    bool operator<(const map<Key,Mapped,Compare,Allocator> &lhs,
+                   const map<Key,Mapped,Compare,Allocator> &rhs);
+
+
     template<typename Key, class Mapped, class Compare = std::less<Key>, class Allocator=allocator<pair<const Key, Mapped>>>
     class map {
 
@@ -29,21 +38,22 @@ namespace mini {
 
         class value_compare {
             friend class map<Key, Mapped, Compare, Allocator>;
-
         private:
             Compare comp;
-
             value_compare(Compare c) : comp(c) {}
-
         public:
-            bool operator()(const value_type &x, const value_type &y) const {
-                return comp(x.first, y.first);
-            }
+            bool operator()(const value_type &x, const value_type &y) const { return comp(x.first, y.first); }
         };
 
     private:
         typedef rb_tree<key_type, value_type, Select1st<value_type>, key_compare, Allocator> tree_type;
         tree_type tree;
+
+        friend bool operator==<Key,Mapped,Compare,Allocator>(const map<Key,Mapped,Compare,Allocator> &lhs,
+                               const map<Key,Mapped,Compare,Allocator> &rhs);
+
+        bool operator<  <Key,Mapped,Compare,Allocator>(const map<Key,Mapped,Compare,Allocator> &lhs,
+                       const map<Key,Mapped,Compare,Allocator> &rhs);
 
     public:
         typedef typename tree_type::const_iterator iterator;
@@ -109,10 +119,51 @@ namespace mini {
 
         const_iterator find(const Key &key) const {return tree.find(key);}
 
-        const_iterator lower_bound(const Key &key) const
+        const_iterator lower_bound(const Key &key) const {return tree.lower_bound(key);}
+
+        const_iterator upper_bound(const Key &key) const {return tree.upper_bound(key);}
+
+        pair<const_iterator,const_iterator> equal_range(const Key &key) const {return tree.equal_range(key);}
+
+
 
     };
 
+    template <class Key,class Mapped,class Compare,class Allocator>
+    bool operator==(const map<Key,Mapped,Compare,Allocator> &lhs,
+                    const map<Key,Mapped,Compare,Allocator> &rhs){
+        return lhs.tree==rhs.tree;
+    }
+
+    template <class Key,class Mapped,class Compare,class Allocator>
+    bool operator<(const map<Key,Mapped,Compare,Allocator> &lhs,
+                    const map<Key,Mapped,Compare,Allocator> &rhs){
+        return lhs.tree<rhs.tree;
+    }
+
+    template <class Key,class Mapped,class Compare,class Allocator>
+    bool operator!=(const map<Key,Mapped,Compare,Allocator> &lhs,
+                    const map<Key,Mapped,Compare,Allocator> &rhs){
+        return !(lhs==rhs);
+    }
+
+    template <class Key,class Mapped,class Compare,class Allocator>
+    bool operator>(const map<Key,Mapped,Compare,Allocator> &lhs,
+                    const map<Key,Mapped,Compare,Allocator> &rhs){
+        return rhs<lhs;
+    }
+
+    template <class Key,class Mapped,class Compare,class Allocator>
+    bool operator<=(const map<Key,Mapped,Compare,Allocator> &lhs,
+                    const map<Key,Mapped,Compare,Allocator> &rhs){
+        return !(rhs<lhs);
+    }
+
+    template <class Key,class Mapped,class Compare,class Allocator>
+    bool operator>=(const map<Key,Mapped,Compare,Allocator> &lhs,
+                    const map<Key,Mapped,Compare,Allocator> &rhs){
+        return !(lhs<rhs);
+    }
 }
 
 #endif //MINISTL_MAP_H
