@@ -46,6 +46,10 @@ namespace mini {
 
         rb_tree_iterator(node_ptr ptr) { node = ptr; }
 
+        //when Reference is const Value& ,Pointer is const Value*
+        //this constructor allows copy from rb_tree_iterator<Value,Value&,Value*>
+        //for set and map,this constructor allows const_iterator initialized from non_const iterator
+        //otherwise is not allowed
         rb_tree_iterator(const iterator &i) { node = i.node; }
 
         Reference operator*() const { return node->value; }
@@ -161,9 +165,15 @@ namespace mini {
         }
 
         //TODO: all construction may give rise to exception
-        node_ptr create_node(const_reference val) {
+        node_ptr create_node() {
             node_ptr ptr = get_node();
-            construct(&(ptr->value), val);
+            construct(&(ptr->value), Value());
+            return ptr;
+        }
+
+        node_ptr create_node(const_reference v) {
+            node_ptr ptr = get_node();
+            construct(&(ptr->value), v);
             return ptr;
         }
 
@@ -240,7 +250,7 @@ namespace mini {
         }
 
         node_ptr create_tmp_nil() {
-            node_ptr tmp_nil = create_node(0);
+            node_ptr tmp_nil = create_node();
             tmp_nil->color = rb_tree_black;
             tmp_nil->left = tmp_nil;
             tmp_nil->right = tmp_nil;
@@ -834,7 +844,7 @@ namespace mini {
     }
 
     template<typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
-    size_type rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
+    typename rb_tree<Key,Value,KeyOfValue,Compare,Alloc>::size_type rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::
     erase(const Key &key){
         size_type count = 0;
         iterator iter = find(key);

@@ -8,8 +8,8 @@
 namespace mini {
 
     template<class Pair>
-    class Select1st {
-        const typename Pair::first_type operator()(const Pair &p) const {
+    struct Select1st {
+        const typename Pair::first_type& operator()(const Pair &p) const {
             return p.first;
         }
     };

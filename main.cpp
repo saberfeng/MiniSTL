@@ -7,6 +7,8 @@
 #include "allocator.h"
 #include "rb_tree.h"
 #include "set.h"
+#include "map.h"
+#include "util.h"
 
 using std::cout;
 using std::endl;
@@ -141,12 +143,41 @@ void TestPrintTree() {
     //
 }
 
+template<class Key,class Mapped>
+void PrintMap(const mini::map<Key,Mapped> &m) {
+    typename mini::map<Key,Mapped>::iterator iter = m.cbegin();
+    while (iter != m.cend())
+        cout << (*(iter++)).second << " ";
+    cout << endl;
+}
+
+void TestMap() {
+    typedef mini::map<std::string, int> map_type;
+    typedef typename map_type::iterator iterator;
+
+    map_type m1;
+    m1.insert(mini::make_pair(std::string("one"), 1));
+    m1.insert(mini::make_pair(std::string("two"), 2));
+    m1.insert(mini::make_pair(std::string("three"), 3));
+    m1.insert(mini::make_pair(std::string("four"), 4));
+
+    PrintMap(m1);
+
+    cout<<m1[std::string("two")]<<endl;
+    cout<<m1[std::string("five")]<<endl;
+
+    cout<<m1.erase(std::string("one"))<<endl;
+    PrintMap(m1);
+
+}
+
 int main() {
 
     //TestAllocator();
     //TestRBTree();
-    TestSet();
+    //TestSet();
     //TestPrintTree();
+    TestMap();
 
     return 0;
 }

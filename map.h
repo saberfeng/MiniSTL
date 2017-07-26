@@ -11,6 +11,9 @@
 
 namespace mini {
 
+    template<typename Key, class Mapped, class Compare, class Allocator>
+    class map;
+
     template <class Key,class Mapped,class Compare,class Allocator>
     bool operator==(const map<Key,Mapped,Compare,Allocator> &lhs,
                     const map<Key,Mapped,Compare,Allocator> &rhs);
@@ -20,7 +23,7 @@ namespace mini {
                    const map<Key,Mapped,Compare,Allocator> &rhs);
 
 
-    template<typename Key, class Mapped, class Compare = std::less<Key>, class Allocator=allocator<pair<const Key, Mapped>>>
+    template<typename Key, class Mapped, class Compare = std::less<Key>, class Allocator=allocator<rb_tree_node<pair<const Key, Mapped>>>>
     class map {
 
     public:
@@ -52,7 +55,7 @@ namespace mini {
         friend bool operator==<Key,Mapped,Compare,Allocator>(const map<Key,Mapped,Compare,Allocator> &lhs,
                                const map<Key,Mapped,Compare,Allocator> &rhs);
 
-        bool operator<  <Key,Mapped,Compare,Allocator>(const map<Key,Mapped,Compare,Allocator> &lhs,
+        friend bool operator<  <Key,Mapped,Compare,Allocator>(const map<Key,Mapped,Compare,Allocator> &lhs,
                        const map<Key,Mapped,Compare,Allocator> &rhs);
 
     public:
@@ -79,7 +82,12 @@ namespace mini {
             return *this;
         }
 
-        Mapped &operator[](const Key &key);
+        const Mapped &operator[](const Key &key){
+            iterator i=lower_bound(key);
+            if(i==end() || key_compare()(key,(*i).first))
+                i=insert(i,value_type(key,Mapped()));
+            return (*i).second;
+        }
 
         iterator begin() { return tree.begin(); }
 
