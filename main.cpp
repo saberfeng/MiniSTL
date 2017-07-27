@@ -9,6 +9,7 @@
 #include "set.h"
 #include "map.h"
 #include "util.h"
+#include "deque.h"
 
 using std::cout;
 using std::endl;
@@ -177,7 +178,7 @@ int main() {
     //TestRBTree();
     //TestSet();
     //TestPrintTree();
-    TestMap();
+    //TestMap();
 
     return 0;
 }
