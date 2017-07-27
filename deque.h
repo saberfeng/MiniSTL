@@ -145,10 +145,30 @@ namespace mini {
 
         reference       front() {return *start;}
         const_reference front() const {return *start;}
-        reference       back() {return *end;}
-        const_reference back() const {return *end;}
+        reference       back() {return *finish;}
+        const_reference back() const {return *finish;}
 
-        
+        iterator begin(){return start;}
+        const_iterator cbegin() const {return start;}
+        iterator end() {return finish;}
+        const_iterator cend() const {return finish;}
+
+        iterator insert(iterator pos,const_reference value);
+        iterator insert(const_iterator pos,const_reference value);
+        void insert(iterator pos,size_type count,const_reference value);
+        template <class InputIterator>
+        void insert(iterator pos,InputIterator first,InputIterator last);
+        template <class InputIterator>
+        iterator insert(const_iterator pos,InputIterator first,InputIterator last);
+        iterator insert(const_iterator pos,std::initializer_list<value_type> ilist);
+
+        iterator erase(iterator pos);
+        iterator erase(const_iterator pos);
+        iterator erase(iterator first,iterator last);
+        iterator erase(const_iterator first,const_iterator last);
+
+
+
 
     private:
 
@@ -158,7 +178,7 @@ namespace mini {
         size_type map_size;
 
         iterator start;
-        iterator end;
+        iterator finish;
 
         Allocator value_allocator;
         allocator <pointer> map_allocator;
@@ -172,11 +192,17 @@ namespace mini {
             *node = value_allocator.allocate(buffer_size);
 
             start = iterator(*node, *node + buffer_size, *node + buffer_size / 2, node);
-            end = iterator(*node, *node + buffer_size, *node + buffer_size / 2, node);
+            finish = iterator(*node, *node + buffer_size, *node + buffer_size / 2, node);
         }
 
 
     };
+
+    template <class Value,class Allocator>
+    typename deque<Value,Allocator>::iterator
+    deque<Value,Allocator>::insert(deque::iterator pos, const_reference value) {
+
+    }
 
 
 }
