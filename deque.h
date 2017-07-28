@@ -36,17 +36,17 @@ namespace mini {
         template<class Val,class Alloc> friend
         class deque;
 
-        deque_iterator() : start(nullptr), end(nullptr), cur(nullptr), node(nullptr) {}
+        deque_iterator() : begin(nullptr), end(nullptr), cur(nullptr), node(nullptr) {}
 
-        deque_iterator(base_ptr start_ptr,
+        deque_iterator(base_ptr begin_ptr,
                        base_ptr end_ptr,
                        base_ptr cur_ptr,
                        map_pointer node_ptr) :
-                start(start_ptr), end(end_ptr), cur(cur_ptr), node(node_ptr) {}
+                begin(begin_ptr), end(end_ptr), cur(cur_ptr), node(node_ptr) {}
 
         //allows conversion from iterator to const_iterator
         deque_iterator(const iterator &other) :
-                start(other.start), end(other.end), cur(other.cur), node(other.node) {}
+                begin(other.begin), end(other.end), cur(other.cur), node(other.node) {}
 
         //reference is a dependent name
         base_ref operator*() { return *cur; }
@@ -55,15 +55,15 @@ namespace mini {
 
         void set_node(base_ptr *new_node) {
             node = new_node;
-            start = *node;
-            end = start + deque_buffer_size(0, sizeof(value_type));
+            begin = *node;
+            end = begin + deque_buffer_size(0, sizeof(value_type));
         }
 
         self &operator++() {
             ++cur;
             if (cur == end) {
                 set_node(node + 1);
-                cur = start;
+                cur = begin;
             }
             return *this;
         }
@@ -75,7 +75,7 @@ namespace mini {
         }
 
         self &operator--() {
-            if (cur == start) {
+            if (cur == begin) {
                 set_node(node - 1);
                 cur = end;
             }
@@ -94,15 +94,15 @@ namespace mini {
             base_diff node_steps = 0;
             base_diff node_offset = 0;
             if (n > 0) {
-                node_steps = (n + (cur - start)) / buffer_size;
-                node_offset = (n + (cur - start)) % buffer_size;
+                node_steps = (n + (cur - begin)) / buffer_size;
+                node_offset = (n + (cur - begin)) % buffer_size;
 
             } else if (n < 0) {
                 node_steps = (n - (end - cur) + 1) / buffer_size;
                 node_offset = buffer_size + (n - (end - cur)) % buffer_size;
             }
             set_node(node + node_steps);
-            cur = start + node_offset;
+            cur = begin + node_offset;
             return *this;
         }
 
@@ -138,7 +138,7 @@ namespace mini {
         bool operator>=(const self &other) { return !(*this < other); }
 
     private:
-        base_ptr start;
+        base_ptr begin;
         base_ptr end;
         base_ptr cur;
         map_pointer node;
@@ -242,6 +242,7 @@ namespace mini {
 
         void reallocate_map(bool front);
 
+        void clear();
 
     };
 
@@ -288,6 +289,18 @@ namespace mini {
     typename deque<Value, Allocator>::iterator
     deque<Value, Allocator>::insert(deque::iterator pos, const_reference value) {
 
+    }
+
+    template <class Value,class Allocator>
+    void deque<Value,Allocator>::clear(){
+        size_type buffer_size=deque_buffer_size(0, sizeof(value_type));
+        for(map_pointer node=start.node+1;node!=finish.node+1;++node){
+            destroy(*node,*node+buffer_size);
+            value_allocator.deallocate(*node,buffer_size);
+        }
+        destroy(*(start.node),*(start.node)+buffer_size);
+        start.cur=start.begin+buffer_size/2;
+        finish=start;
     }
 
 

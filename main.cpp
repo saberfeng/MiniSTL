@@ -217,9 +217,10 @@ bool TestDeque(int test_num){
         //cout<<*deque_iter<<endl;
     }
 
-    /*
+
     cout<<endl<<(flag?"Passed":"NOOOOO")<<endl<<endl;
         //output.push_back(*iter);
+    /*
     cout<<"output size:"<<output.size()<<endl
             <<"input size:"<<input.size()<<endl;
             */
@@ -243,7 +244,8 @@ int main() {
     //TestMap();
     //TestDeque();
     //DebugTestDeque();
-    TestDequeWrap();
+    //TestDequeWrap();
+    TestDeque(347);
 
     return 0;
 }
