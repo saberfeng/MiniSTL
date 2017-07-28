@@ -172,6 +172,68 @@ void TestMap() {
 
 }
 
+void DebugTestDeque(){
+    typedef mini::deque<int> deque_type;
+    typedef typename mini::deque<int>::iterator iterator;
+    deque_type deque1;
+    std::vector<int> input={100,101,102,103,104,105,106};
+
+    for(auto &item:input)
+        deque1.push_back(item);
+
+
+    /*
+    for(std::vector<int>::iterator vec_iter=input.begin();vec_iter!=input.end();++vec_iter)
+        cout<<*vec_iter<<" ";
+    cout<<endl;
+     */
+
+    std::vector<int> output;
+    for(iterator iter=deque1.begin();iter!=deque1.end();++iter)
+        output.push_back(*iter);
+    cout<<output.size()<<endl;
+
+}
+
+bool TestDeque(int test_num){
+    typedef mini::deque<int> deque_type;
+    typedef typename mini::deque<int>::iterator iterator;
+    deque_type deque1;
+    std::vector<int> input;
+
+    //int test_num=500;
+
+    for(int i=0;i<test_num;++i)
+        input.push_back(i);
+    for(auto &item:input)
+        deque1.push_back(item);
+
+    std::vector<int> output;
+    bool flag=true;
+    std::vector<int>::iterator vec_iter=input.begin();
+    for(iterator deque_iter=deque1.begin();deque_iter!=deque1.end();++deque_iter,++vec_iter){
+        if(*vec_iter!=*deque_iter)
+            flag=false;
+        //cout<<*deque_iter<<endl;
+    }
+
+    /*
+    cout<<endl<<(flag?"Passed":"NOOOOO")<<endl<<endl;
+        //output.push_back(*iter);
+    cout<<"output size:"<<output.size()<<endl
+            <<"input size:"<<input.size()<<endl;
+            */
+
+    return flag;
+}
+
+void TestDequeWrap(){
+    for(int i=300;i<500;++i){
+        bool result=TestDeque(i);
+        cout<<i<<"   "<<result<<endl;
+    }
+}
+
 int main() {
 
     //TestAllocator();
@@ -179,6 +241,9 @@ int main() {
     //TestSet();
     //TestPrintTree();
     //TestMap();
+    //TestDeque();
+    //DebugTestDeque();
+    TestDequeWrap();
 
     return 0;
 }
