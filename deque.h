@@ -33,7 +33,7 @@ namespace mini {
         typedef typename iterator_base<random_access_iterator_tag, Value, ptrdiff_t, Pointer, Reference>::difference_type base_diff;
         typedef base_ptr *map_pointer;
 
-        template<class Val,class Alloc> friend
+        template<class Val, class Alloc> friend
         class deque;
 
         deque_iterator() : begin(nullptr), end(nullptr), cur(nullptr), node(nullptr) {}
@@ -171,6 +171,8 @@ namespace mini {
 
         deque(std::initializer_list<value_type> init);
 
+        ~deque() { clear(); }
+
         reference front() { return *start; }
 
         const_reference front() const { return *start; }
@@ -225,12 +227,16 @@ namespace mini {
         iterator start;
         iterator finish;
 
+        /*
         Allocator value_allocator;
         allocator <pointer> map_allocator;
+         */
+        std::allocator<value_type> value_allocator;
+        std::allocator<pointer> map_allocator;
 
 
         void init() {
-            map = map_allocator.allocate(1);
+            map = map_allocator.allocate(8);
             map_size = 8;
             map_pointer node = map + map_size / 2;
             size_type buffer_size = deque_buffer_size(0, sizeof(value_type));
@@ -254,8 +260,8 @@ namespace mini {
         } else {
             if (finish.node == map + map_size - 1)
                 reallocate_map(false);
-            *(finish.node+1)=value_allocator.allocate(deque_buffer_size(0, sizeof(value_type)));
-            construct(finish.cur,value);
+            *(finish.node + 1) = value_allocator.allocate(deque_buffer_size(0, sizeof(value_type)));
+            construct(finish.cur, value);
             ++finish;
         }
     }
@@ -271,13 +277,13 @@ namespace mini {
             if (front)
                 std::copy_backward(start.node, finish.node + 1, new_start_node + nodes_size);
             else
-                std::copy(start.node, finish.node, new_start_node);
+                std::copy(start.node, finish.node+1, new_start_node);
         } else {
             map_size *= 2;
             map_pointer new_map = map_allocator.allocate(map_size);
             free_space = map_size - nodes_size;
             new_start_node = new_map + free_space / 2;
-            std::copy(start.node, finish.node+1, new_start_node);
+            std::copy(start.node, finish.node + 1, new_start_node);
             map_allocator.deallocate(map, old_map_size);
             map = new_map;
         }
@@ -291,16 +297,16 @@ namespace mini {
 
     }
 
-    template <class Value,class Allocator>
-    void deque<Value,Allocator>::clear(){
-        size_type buffer_size=deque_buffer_size(0, sizeof(value_type));
-        for(map_pointer node=start.node+1;node!=finish.node+1;++node){
-            destroy(*node,*node+buffer_size);
-            value_allocator.deallocate(*node,buffer_size);
+    template<class Value, class Allocator>
+    void deque<Value, Allocator>::clear() {
+        size_type buffer_size = deque_buffer_size(0, sizeof(value_type));
+        for (map_pointer node = start.node + 1; node != finish.node + 1; ++node) {
+            destroy(*node, *node + buffer_size);
+            value_allocator.deallocate(*node, buffer_size);
         }
-        destroy(*(start.node),*(start.node)+buffer_size);
-        start.cur=start.begin+buffer_size/2;
-        finish=start;
+        destroy(*(start.node), *(start.node) + buffer_size);
+        start.cur = start.begin + buffer_size / 2;
+        finish = start;
     }
 
 
