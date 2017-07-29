@@ -230,6 +230,46 @@ void TestDequeWrap(){
     }
 }
 
+template <class Value>
+void PrintSmallDeque(mini::deque<Value> &d){
+    for(typename mini::deque<Value>::iterator iter=d.begin();
+            iter!=d.end();++iter)
+        cout<<*iter<<" ";
+    cout<<endl;
+}
+
+void TestDeque2(){
+    typedef mini::deque<int> deque_type;
+    typedef typename mini::deque<int>::iterator iterator;
+
+    deque_type deque1;
+    std::vector<int> input;
+
+    for(int i=0;i<5;++i)
+        input.push_back(i);
+    for(auto &item:input)
+        deque1.push_front(item);
+
+    iterator iter1= deque1.begin();
+    iterator iter2=deque1.end();
+
+    cout<<iter2-iter1<<endl;
+
+    deque1.insert(deque1.begin(),100);
+    PrintSmallDeque(deque1);
+    deque1.insert(deque1.end(),101);
+    PrintSmallDeque(deque1);
+    iterator iter=deque1.begin();
+    ++iter;
+    iter=deque1.insert(iter,200);
+    PrintSmallDeque(deque1);
+    iter+=5;
+    iter=deque1.insert(iter,111);
+    PrintSmallDeque(deque1);
+
+
+}
+
 int main() {
 
     //TestAllocator();
@@ -240,7 +280,8 @@ int main() {
     //TestDeque();
     //DebugTestDeque();
     //TestDequeWrap();
-    TestDeque(2048);
+    //TestDeque(2048);
+    TestDeque2();
 
     return 0;
 }

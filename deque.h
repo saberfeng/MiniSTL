@@ -36,6 +36,9 @@ namespace mini {
         template<class Val, class Alloc> friend
         class deque;
 
+        template<class V, class R, class P> friend
+        class deque_iterator;
+
         deque_iterator() : begin(nullptr), end(nullptr), cur(nullptr), node(nullptr) {}
 
         deque_iterator(base_ptr begin_ptr,
@@ -57,6 +60,11 @@ namespace mini {
             node = new_node;
             begin = *node;
             end = begin + deque_buffer_size(0, sizeof(value_type));
+        }
+
+        base_diff operator-(const self &other) const {
+            return base_diff(deque_buffer_size(0, sizeof(value_type))) * (node - other.node - 1) +
+                   (other.end - other.cur) + (cur - begin);
         }
 
         self &operator++() {
@@ -120,22 +128,22 @@ namespace mini {
             return tmp -= n;
         }
 
-        bool operator==(const self &other) { return cur == other.cur; }
+        bool operator==(const self &other) const { return cur == other.cur; }
 
-        bool operator!=(const self &other) { return !(*this == other); }
+        bool operator!=(const self &other) const { return !(*this == other); }
 
-        bool operator<(const self &other) {
+        bool operator<(const self &other) const {
             if (node == other.node)
                 return cur < other.cur;
             else
                 return node < other.node;
         }
 
-        bool operator>(const self &other) { return other < *this; }
+        bool operator>(const self &other) const { return other < *this; }
 
-        bool operator<=(const self &other) { return !(other < *this); }
+        bool operator<=(const self &other) const { return !(other < *this); }
 
-        bool operator>=(const self &other) { return !(*this < other); }
+        bool operator>=(const self &other) const { return !(*this < other); }
 
     private:
         base_ptr begin;
@@ -162,14 +170,26 @@ namespace mini {
 
         explicit deque() { init(); }
 
-        explicit deque(size_type count, const_reference value = value_type());
+        explicit deque(size_type count, const_reference value = value_type()) {
+            init();
+            for (size_type i = 0; i < count; ++i)
+                push_back(value);
+        }
 
         template<class InputIterator>
-        deque(InputIterator first, InputIterator last);
+        deque(InputIterator first, InputIterator last) {
+            init();
+            while (first != last)
+                push_back(*first++);
+        }
 
         deque(const deque &other);
 
-        deque(std::initializer_list<value_type> init);
+        deque(std::initializer_list<value_type> ilist) {
+            init();
+            for (auto &item:ilist)
+                push_back(item);
+        }
 
         ~deque() { clear(); }
 
@@ -189,10 +209,28 @@ namespace mini {
 
         const_iterator cend() const { return finish; }
 
+        void assign(size_type count,const_reference value){
+            clear();
+            for(int i=0;i<count;++i)
+                push_back(value);
+        }
+
+        template<class InputIterator>
+        void assign(InputIterator first,InputIterator last){
+            clear();
+            while(first!=last)
+                push_back(*first++);
+        }
+
+        void assign(std::initializer_list<value_type> ilist){
+            clear();
+            for(auto &item:ilist)
+                push_back(item);
+        }
+
         void push_back(const_reference value);
 
         void push_front(const_reference value);
-
 
         iterator insert(iterator pos, const_reference value);
 
@@ -206,7 +244,7 @@ namespace mini {
         template<class InputIterator>
         iterator insert(const_iterator pos, InputIterator first, InputIterator last);
 
-        iterator insert(const_iterator pos, std::initializer_list<value_type> ilist);
+        iterator insert(iterator pos, std::initializer_list<value_type> ilist);
 
         iterator erase(iterator pos);
 
@@ -216,6 +254,24 @@ namespace mini {
 
         iterator erase(const_iterator first, const_iterator last);
 
+        reference operator[](size_type pos) { return *(start + pos); }
+
+        const_reference operator[](size_type pos) const { return *(start + pos); }
+
+        reference at(size_type pos) { return *(start + pos); }
+
+        const_reference at(size_type pos) const { return *(start + pos); }
+
+
+        void pop_back();
+
+        void pop_front();
+
+        void clear();
+
+        size_type size() { return size_type(finish - start); }
+
+        bool empty() { return size() == 0; }
 
     private:
 
@@ -227,12 +283,11 @@ namespace mini {
         iterator start;
         iterator finish;
 
-        /*
         Allocator value_allocator;
         allocator <pointer> map_allocator;
-         */
-        std::allocator<value_type> value_allocator;
-        std::allocator<pointer> map_allocator;
+
+        //std::allocator<value_type> value_allocator;
+        //std::allocator<pointer> map_allocator;
 
 
         void init() {
@@ -247,8 +302,6 @@ namespace mini {
         }
 
         void reallocate_map(bool front);
-
-        void clear();
 
     };
 
@@ -267,6 +320,20 @@ namespace mini {
     }
 
     template<class Value, class Allocator>
+    void deque<Value, Allocator>::push_front(const_reference value) {
+        if (start.cur > start.begin) {
+            --start.cur;
+            construct(start.cur, value);
+        } else {
+            if (start.node == map)
+                reallocate_map(true);
+            *(start.node - 1) = value_allocator.allocate(deque_buffer_size(0, sizeof(value_type)));
+            --start;
+            construct(start.cur, value);
+        }
+    }
+
+    template<class Value, class Allocator>
     void deque<Value, Allocator>::reallocate_map(bool front) {
         size_type nodes_size = finish.node - start.node + 1;
         size_type old_map_size = map_size;
@@ -277,7 +344,7 @@ namespace mini {
             if (front)
                 std::copy_backward(start.node, finish.node + 1, new_start_node + nodes_size);
             else
-                std::copy(start.node, finish.node+1, new_start_node);
+                std::copy(start.node, finish.node + 1, new_start_node);
         } else {
             map_size *= 2;
             map_pointer new_map = map_allocator.allocate(map_size);
@@ -294,7 +361,132 @@ namespace mini {
     template<class Value, class Allocator>
     typename deque<Value, Allocator>::iterator
     deque<Value, Allocator>::insert(deque::iterator pos, const_reference value) {
+        if (pos < start || pos > finish)
+            return finish;
+        if (pos == finish) {
+            push_back(value);
+            iterator tmp = finish;
+            --tmp;
+            return tmp;
+        } else if (pos == start) {
+            push_front(value);
+            return start;
+        } else {
+            if (pos - start < finish - pos) {
+                push_front(*start);
+                iterator copy_start = start;
+                copy_start += 2;
+                std::copy(copy_start, pos, start + 1);
+                --pos;
+            } else {
+                iterator end1 = finish;
+                iterator end2 = end1;
+                push_back(*(--end1));
+                std::copy_backward(pos, end1, end2);
+            }
+            construct(pos.cur, value);
+            return pos;
+        }
+    }
 
+    template<class Value, class Allocator>
+    void deque<Value, Allocator>::insert(iterator pos, size_type count, const_reference value) {
+        for (size_type i = 0; i < count; ++i)
+            pos = insert(pos, value);
+    }
+
+    template<class Value, class Allocator>
+    template<class InputIterator>
+    void deque<Value, Allocator>::insert(iterator pos, InputIterator first, InputIterator last) {
+        while (first != last) {
+            pos = insert(pos, *first);
+            ++first;
+        }
+    }
+
+    template<class Value, class Allocator>
+    typename deque<Value, Allocator>::iterator
+    deque<Value, Allocator>::insert(iterator pos, std::initializer_list<value_type> ilist) {
+        for (auto &item:ilist)
+            pos = insert(pos, item);
+        return pos;
+    }
+
+    template<class Value, class Allocator>
+    typename deque<Value, Allocator>::iterator
+    deque<Value, Allocator>::erase(iterator pos) {
+        if (pos == start) {
+            pop_front();
+            return start;
+        } else if (pos == finish - 1) {
+            pop_back();
+            return finish;
+        } else {
+            if (pos - start < finish - pos) {
+                std::copy_backward(start, pos, pos + 1);
+                pop_front();
+                ++pos;
+            } else {
+                std::copy(pos + 1, finish, pos);
+                pop_back();
+            }
+            return pos;
+        }
+    }
+
+    template<class Value, class Allocator>
+    typename deque<Value, Allocator>::iterator
+    deque<Value, Allocator>::erase(iterator first, iterator last) {
+        if (first == start && last == finish) {
+            clear();
+            return finish;
+        } else {
+            size_type buffer_size = deque_buffer_size(0, sizeof(value_type));
+            size_type erase_size = size_type(last - first);
+            iterator result;
+            if (first - start < finish - last) {
+                std::copy_backward(start, first, last);
+                iterator new_start = start + erase_size;
+                destroy(start, new_start);
+                for (map_pointer node = start.node; node < new_start.node; ++node)
+                    value_allocator.deallocate(*node, buffer_size);
+                start = new_start;
+                result = last;
+            } else {
+                std::copy(last, finish, first);
+                iterator new_finish = finish - erase_size;
+                destroy(new_finish, finish);
+                for (map_pointer node = new_finish.node; node < finish.node; ++node)
+                    value_allocator.deallocate(*node, buffer_size);
+                finish = new_finish;
+                result = first;
+            }
+            return result;
+        }
+
+    }
+
+
+    template<class Value, class Allocator>
+    void deque<Value, Allocator>::pop_front() {
+        if (start != finish) {
+            destroy(start.cur);
+            iterator old_start = start;
+            ++start;
+            if (old_start.cur == old_start.end - 1)
+                map_allocator.deallocate(old_start.begin, deque_buffer_size(0, sizeof(value_type)));
+        }
+    }
+
+    template<class Value, class Allocator>
+    void deque<Value, Allocator>::pop_back() {
+        if (start != finish) {
+            iterator old_finish = finish;
+            --finish;
+            destroy(finish.cur);
+            if (old_finish.cur == old_finish.begin)
+                map_allocator.deallocate(old_finish.begin, deque_buffer_size(0, sizeof(value_type)));
+        }
     }
 
     template<class Value, class Allocator>
