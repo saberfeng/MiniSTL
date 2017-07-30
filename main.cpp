@@ -10,6 +10,7 @@
 #include "map.h"
 #include "util.h"
 #include "deque.h"
+#include "vector.h"
 
 using std::cout;
 using std::endl;
@@ -266,7 +267,24 @@ void TestDeque2(){
     iter+=5;
     iter=deque1.insert(iter,111);
     PrintSmallDeque(deque1);
+}
 
+template <class V>
+void PrintVector(mini::vector<V> &vec){
+    typedef typename mini::vector<int>::iterator iterator;
+    for(iterator iter=vec.begin();iter!=vec.end();++iter)
+        cout<<*iter<<endl;
+    cout<<endl;
+}
+
+void TestVector(){
+    typedef mini::vector<int> vector_type;
+    typedef typename mini::vector<int>::iterator iterator;
+    vector_type vec;
+
+    for(int i=0;i<1024;++i)
+        vec.push_back(i);
+    //PrintVector(vec);
 
 }
 
@@ -281,7 +299,8 @@ int main() {
     //DebugTestDeque();
     //TestDequeWrap();
     //TestDeque(2048);
-    TestDeque2();
+    //TestDeque2();
+    TestVector();
 
     return 0;
 }

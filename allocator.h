@@ -57,6 +57,8 @@ namespace mini{
 
 
         void deallocate(pointer ptr,size_type num){
+            if(ptr==nullptr)
+                return;
             size_type request_bytes=num*sizeof(T);
             if(request_bytes>128)
                 return _deallocate(ptr);
