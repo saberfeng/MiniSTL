@@ -258,7 +258,8 @@ namespace mini {
     }
 
     template<class Value, class Allocator>
-    void vector<Value, Allocator>::insert(const_iterator pos, size_type count, const_reference value) {
+    typename vector<Value,Allocator>::iterator
+    vector<Value, Allocator>::insert(const_iterator pos, size_type count, const_reference value) {
         iterator position=pos;
         insert(position,count,value);
     }
@@ -285,8 +286,6 @@ namespace mini {
             position = insert(position, item);
         return position;
     }
-
-    template
 
     template<class Value, class Allocator>
     void vector<Value, Allocator>::insert_aux(iterator pos, const_reference value) {

@@ -10,12 +10,6 @@
 
 namespace mini {
 
-    /*
-    std::size_t deque_buffer_size(std::size_t n, std::size_t size) {
-        return n != 0 ? n : (size < 512 ? std::size_t(512 / size) : std::size_t(1));
-    }
-     */
-
     std::size_t deque_buffer_size(std::size_t n, std::size_t size) {
         return n != 0 ? n : (size < 512 ? std::size_t(512 / size) : std::size_t(1));
     }
@@ -27,6 +21,7 @@ namespace mini {
         typedef Value value_type;
         typedef std::size_t size_type;
         typedef deque_iterator<Value, Value &, Value *> iterator;
+        typedef deque_iterator<Value, const Value &, const Value *> const_iterator;
         typedef deque_iterator<Value, Reference, Pointer> self;
         typedef typename iterator_base<random_access_iterator_tag, Value, ptrdiff_t, Pointer, Reference>::pointer base_ptr;
         typedef typename iterator_base<random_access_iterator_tag, Value, ptrdiff_t, Pointer, Reference>::reference base_ref;
@@ -49,6 +44,10 @@ namespace mini {
 
         //allows conversion from iterator to const_iterator
         deque_iterator(const iterator &other) :
+                begin(other.begin), end(other.end), cur(other.cur), node(other.node) {}
+
+        //allows conversion from const_iterator to iterator
+        deque_iterator(const const_iterator &other) :
                 begin(other.begin), end(other.end), cur(other.cur), node(other.node) {}
 
         //reference is a dependent name
@@ -118,12 +117,12 @@ namespace mini {
             return *this += -n;
         }
 
-        self operator+(base_diff n) {
+        self operator+(base_diff n) const {
             self tmp = *this;
             return tmp += n;
         }
 
-        self operator-(base_diff n) {
+        self operator-(base_diff n) const {
             self tmp = *this;
             return tmp -= n;
         }
@@ -183,7 +182,11 @@ namespace mini {
                 push_back(*first++);
         }
 
-        deque(const deque &other);
+        deque(const deque &other) {
+            init();
+            for (const_iterator iter = other.cbegin(); iter != other.cend(); ++iter)
+                push_back(*iter);
+        }
 
         deque(std::initializer_list<value_type> ilist) {
             init();
@@ -209,22 +212,22 @@ namespace mini {
 
         const_iterator cend() const { return finish; }
 
-        void assign(size_type count,const_reference value){
+        void assign(size_type count, const_reference value) {
             clear();
-            for(int i=0;i<count;++i)
+            for (int i = 0; i < count; ++i)
                 push_back(value);
         }
 
         template<class InputIterator>
-        void assign(InputIterator first,InputIterator last){
+        void assign(InputIterator first, InputIterator last) {
             clear();
-            while(first!=last)
+            while (first != last)
                 push_back(*first++);
         }
 
-        void assign(std::initializer_list<value_type> ilist){
+        void assign(std::initializer_list<value_type> ilist) {
             clear();
-            for(auto &item:ilist)
+            for (auto &item:ilist)
                 push_back(item);
         }
 
@@ -390,6 +393,12 @@ namespace mini {
     }
 
     template<class Value, class Allocator>
+    typename deque<Value, Allocator>::iterator
+    deque<Value, Allocator>::insert(const_iterator pos, const_reference value) {
+
+    }
+
+    template<class Value, class Allocator>
     void deque<Value, Allocator>::insert(iterator pos, size_type count, const_reference value) {
         for (size_type i = 0; i < count; ++i)
             pos = insert(pos, value);
@@ -402,6 +411,13 @@ namespace mini {
             pos = insert(pos, *first);
             ++first;
         }
+    }
+
+    template<class Value, class Allocator>
+    template<class InputIterator>
+    typename deque<Value, Allocator>::iterator
+    deque<Value, Allocator>::insert(const_iterator pos, InputIterator first, InputIterator last) {
+
     }
 
     template<class Value, class Allocator>

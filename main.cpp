@@ -232,9 +232,9 @@ void TestDequeWrap(){
 }
 
 template <class Value>
-void PrintSmallDeque(mini::deque<Value> &d){
-    for(typename mini::deque<Value>::iterator iter=d.begin();
-            iter!=d.end();++iter)
+void PrintSmallDeque(const mini::deque<Value> &d){
+    for(typename mini::deque<Value>::const_iterator iter=d.cbegin();
+        iter!=d.cend();++iter)
         cout<<*iter<<" ";
     cout<<endl;
 }
@@ -300,7 +300,7 @@ int main() {
     //TestDequeWrap();
     //TestDeque(2048);
     //TestDeque2();
-    TestVector();
+    //TestVector();
 
     return 0;
 }
