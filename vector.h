@@ -39,6 +39,44 @@ namespace mini {
 
         vector(std::initializer_list<value_type> ilist);
 
+        ~vector() {
+            clear();
+            value_allocator.deallocate(start, end_of_storage - start);
+        }
+
+        vector &operator=(const vector &other) {
+            clear();
+            for (const_iterator iter = other.cbegin(); iter != other.cend(); ++iter)
+                push_back(*iter);
+            return *this;
+        }
+
+        vector &operator=(std::initializer_list<value_type> ilist){
+            clear();
+            for(auto &item:ilist)
+                push_back(item);
+            return *this;
+        }
+
+        void assign(size_type count,const_reference value){
+            clear();
+            for(int i=0;i<count;++i)
+                push_back(value);
+        }
+
+        template<class InputIterator>
+        void assign(InputIterator first,InputIterator last){
+            clear();
+            while(first!=last)
+                push_back(*first++);
+        }
+
+        void assign(std::initializer_list<value_type> ilist){
+            clear();
+            for(auto &item:ilist)
+                push_back(item);
+        }
+
         iterator begin() { return start; }
 
         const_iterator cbegin() const { return start; }
@@ -65,6 +103,45 @@ namespace mini {
 
         iterator insert(const_iterator pos, std::initializer_list<value_type> ilist);
 
+        void resize(size_type count);
+
+        void resize(size_type count, const_reference value);
+
+        void pop_back();
+
+        void clear();
+
+        iterator erase(iterator pos);
+
+        iterator erase(const_iterator pos);
+
+        iterator erase(iterator first, iterator last);
+
+        iterator erase(const_iterator first, const_iterator last);
+
+        size_type capacity() { return end_of_storage - start; }
+
+        size_type size() { return finish - start; }
+
+        bool empty() { return size() == 0; }
+
+        reference front() { return *start; }
+
+        const_reference front() const { return *start; }
+
+        reference back() { return *finish; }
+
+        const_reference back() const { return *finish; }
+
+        reference operator[](size_type pos) { return *(start + pos); }
+
+        const_reference operator[](size_type pos) const { return *(start + pos); }
+
+        reference at(size_type pos) { return *(start + pos); }
+
+        const_reference at(size_type pos) const { return *(start + pos); }
+
+        void swap(vector& other);
 
     private:
 
@@ -76,6 +153,35 @@ namespace mini {
         iterator finish;
         iterator end_of_storage;
     };
+
+    template<class Value, class Allocator>
+    vector<Value, Allocator>::vector(size_type count, const_reference value):
+            start(nullptr), finish(nullptr), end_of_storage(nullptr) {
+        for (int i = 0; i < count; ++i)
+            push_back(value);
+    }
+
+    template<class Value, class Allocator>
+    template<class InputIterator>
+    vector<Value, Allocator>::vector(InputIterator first, InputIterator last):
+            start(nullptr), finish(nullptr), end_of_storage(nullptr) {
+        while (first != last)
+            push_back(*first++);
+    }
+
+    template<class Value, class Allocator>
+    vector<Value, Allocator>::vector(const vector &other):
+            start(nullptr), finish(nullptr), end_of_storage(nullptr) {
+        for (iterator iter = other.cbegin(); iter != other.cend(); ++iter)
+            push_back(*iter);
+    }
+
+    template<class Value, class Allocator>
+    vector<Value, Allocator>::vector(std::initializer_list<value_type> ilist):
+            start(nullptr), finish(nullptr), end_of_storage(nullptr) {
+        for (auto &item:ilist)
+            push_back(item);
+    }
 
 
     template<class Value, class Allocator>
@@ -89,13 +195,98 @@ namespace mini {
     }
 
     template<class Value, class Allocator>
-    void vector<Value, Allocator>::insert(iterator pos, size_type count, const_reference value) {
-        size_type current_capacity = end_of_storage - start;
-        size_type current_size = finish - start;
-        if (current_size + count <= current_capacity){
+    typename vector<Value, Allocator>::iterator
+    vector<Value, Allocator>::insert(iterator pos, const_reference value) {
+        if (finish != end_of_storage) {
+            construct(finish, *(finish - 1));
+            ++finish;
+            std::copy_backward(pos, finish - 2, finish - 1);
+            construct(pos, value);
+        } else {
+            insert_aux(pos, value);
+        }
+        return pos;
+    }
 
+    template<class Value, class Allocator>
+    typename vector<Value, Allocator>::iterator
+    vector<Value, Allocator>::insert(const_iterator pos, const_reference value) {
+        iterator position=pos;
+        if (finish != end_of_storage) {
+            construct(finish, *(finish - 1));
+            ++finish;
+            std::copy_backward(position, finish - 2, finish - 1);
+            construct(position, value);
+        } else {
+            insert_aux(position, value);
+        }
+        return position;
+    }
+
+    template<class Value, class Allocator>
+    void vector<Value, Allocator>::insert(iterator pos, size_type count, const_reference value) {
+        size_type old_capacity = end_of_storage - start;
+        size_type old_size = finish - start;
+        size_type size_after_pos = finish - pos;
+        size_type size_before_pos = pos - start;
+        if (old_size + count <= old_capacity) {
+            if (count > finish - pos) {
+                std::uninitialized_fill_n(finish, count - size_after_pos, value);
+                iterator old_finish = finish;
+                finish += count - size_after_pos;
+                std::uninitialized_copy(pos, old_finish, finish);
+                finish += size_after_pos;
+                std::fill(pos, old_finish, value);
+            } else {
+                std::uninitialized_copy(finish - count, finish, finish);
+                std::copy_backward(pos, finish - count, finish);
+                std::fill(pos, pos + count, value);
+                finish += count;
+            }
+        } else {
+            size_type new_len = std::max(2 * old_capacity, old_size + count);
+            iterator old_start = start;
+            start = value_allocator.allocate(new_len);
+            std::uninitialized_copy(old_start, pos, start);
+            std::uninitialized_fill_n(start + size_before_pos, count, value);
+            std::uninitialized_copy(pos, finish, start + size_before_pos + count);
+            destroy(old_start, finish);
+            value_allocator.deallocate(old_start, old_size);
+            finish = start + old_size + count;
+            end_of_storage = start + new_len;
         }
     }
+
+    template<class Value, class Allocator>
+    void vector<Value, Allocator>::insert(const_iterator pos, size_type count, const_reference value) {
+        iterator position=pos;
+        insert(position,count,value);
+    }
+
+    template<class Value, class Allocator>
+    template<class InputIterator>
+    void vector<Value, Allocator>::insert(iterator pos, InputIterator first, InputIterator last) {
+        while (first != last)
+            pos = insert(pos, *first++);
+    }
+
+    template<class Value, class Allocator>
+    template<class InputIterator>
+    void vector<Value, Allocator>::insert(const_iterator pos, InputIterator first, InputIterator last) {
+        iterator position=pos;
+        insert(position,first,last);
+    }
+
+    template<class Value, class Allocator>
+    typename vector<Value, Allocator>::iterator
+    vector<Value, Allocator>::insert(const_iterator pos, std::initializer_list<value_type> ilist) {
+        iterator position = pos;
+        for (auto &item:ilist)
+            position = insert(position, item);
+        return position;
+    }
+
+    template
 
     template<class Value, class Allocator>
     void vector<Value, Allocator>::insert_aux(iterator pos, const_reference value) {
@@ -105,22 +296,107 @@ namespace mini {
             std::copy_backward(pos, finish - 2, finish - 1);
             construct(pos, value);
         } else {
-            size_type old_size = end_of_storage - start;
-            size_type new_size = old_size ? 2 * old_size : 1;
+            size_type old_capacity = end_of_storage - start;
+            size_type new_size = old_capacity ? 2 * old_capacity : 1;
             iterator old_start = start;
             start = value_allocator.allocate(new_size);
             std::uninitialized_copy(old_start, pos, start);
             iterator new_pos = start + (pos - old_start);
             construct(new_pos, value);
             std::uninitialized_copy(pos, finish, new_pos + 1);
-            finish = start + old_size + 1;
+            finish = start + old_capacity + 1;
             end_of_storage = start + new_size;
-            if (old_size) {
-                value_allocator.deallocate(old_start, old_size);
+            if (old_capacity) {
+                value_allocator.deallocate(old_start, old_capacity);
             }
         }
     }
 
+    template<class Value, class Allocator>
+    void vector<Value, Allocator>::resize(size_type count) {
+        resize(count, value_type());
+    }
+
+    template<class Value, class Allocator>
+    void vector<Value, Allocator>::resize(size_type count, const_reference value) {
+        size_type old_size = finish - start;
+        if (count < old_size) {
+            destroy(start + count, finish);
+            finish = start + count;
+        } else if (count > old_size) {
+            size_type old_capacity = end_of_storage - start;
+            if (count > old_capacity) {
+                size_type new_capacity = std::max(2 * old_capacity, count);
+                iterator old_start = start;
+                start = value_allocator.allocate(new_capacity);
+                std::uninitialized_copy(old_start, finish, start);
+                destroy(old_start, finish);
+                value_allocator.deallocate(old_start, old_capacity);
+                end_of_storage = start + new_capacity;
+            }
+            std::uninitialized_fill_n(start + old_size, count - old_size, value_type());
+            finish = start + count;
+        }
+    }
+
+    template<class Value, class Allocator>
+    void vector<Value, Allocator>::pop_back() {
+        --finish;
+        destroy(finish);
+    }
+
+    template<class Value, class Allocator>
+    void vector<Value, Allocator>::clear() {
+        destroy(start, finish);
+        finish = start;
+    }
+
+    template<class Value, class Allocator>
+    typename vector<Value, Allocator>::iterator
+    vector<Value, Allocator>::erase(iterator pos) {
+        if (start == finish)
+            return finish;
+        std::copy(pos + 1, finish, pos);
+        pop_back();
+        return pos;
+    }
+
+    template<class Value, class Allocator>
+    typename vector<Value, Allocator>::iterator
+    vector<Value, Allocator>::erase(const_iterator pos) {
+        if (start == finish)
+            return finish;
+        iterator position = pos;
+        std::copy(pos + 1, finish, position);
+        pop_back();
+        return pos;
+    }
+
+
+    template<class Value, class Allocator>
+    typename vector<Value, Allocator>::iterator
+    vector<Value, Allocator>::erase(iterator first, iterator last) {
+        std::copy(last, finish, first);
+        iterator new_finish = first + (finish - last);
+        destroy(new_finish, finish);
+        finish = new_finish;
+        return first;
+    }
+
+    template<class Value, class Allocator>
+    typename vector<Value, Allocator>::iterator
+    vector<Value, Allocator>::erase(const_iterator first, const_iterator last) {
+        iterator first_iter=first;
+        iterator last_iter=last;
+        return erase(first_iter,last_iter);
+    }
+
+    template<class Value, class Allocator>
+    void vector<Value, Allocator>::swap(vector& other) {
+        std::swap(start,other.start);
+        std::swap(finish,other.finish);
+        std::swap(end_of_storage,other.end_of_storage);
+    }
 
 }
 
