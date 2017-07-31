@@ -87,16 +87,9 @@ namespace mini {
 
         void push_back(const_reference value);
 
-        iterator insert(iterator pos, const_reference value);
-
         iterator insert(const_iterator pos, const_reference value);
 
-        void insert(iterator pos, size_type count, const_reference value);
-
         iterator insert(const_iterator pos, size_type count, const_reference value);
-
-        template<class InputIterator>
-        void insert(iterator pos, InputIterator first, InputIterator last);
 
         template<class InputIterator>
         void insert(const_iterator pos, InputIterator first, InputIterator last);
@@ -111,11 +104,7 @@ namespace mini {
 
         void clear();
 
-        iterator erase(iterator pos);
-
         iterator erase(const_iterator pos);
-
-        iterator erase(iterator first, iterator last);
 
         iterator erase(const_iterator first, const_iterator last);
 
@@ -196,7 +185,8 @@ namespace mini {
 
     template<class Value, class Allocator>
     typename vector<Value, Allocator>::iterator
-    vector<Value, Allocator>::insert(iterator pos, const_reference value) {
+    vector<Value, Allocator>::insert(const_iterator position, const_reference value) {
+        iterator pos=start+(position-start);
         if (finish != end_of_storage) {
             construct(finish, *(finish - 1));
             ++finish;
@@ -209,22 +199,9 @@ namespace mini {
     }
 
     template<class Value, class Allocator>
-    typename vector<Value, Allocator>::iterator
-    vector<Value, Allocator>::insert(const_iterator pos, const_reference value) {
-        iterator position=pos;
-        if (finish != end_of_storage) {
-            construct(finish, *(finish - 1));
-            ++finish;
-            std::copy_backward(position, finish - 2, finish - 1);
-            construct(position, value);
-        } else {
-            insert_aux(position, value);
-        }
-        return position;
-    }
-
-    template<class Value, class Allocator>
-    void vector<Value, Allocator>::insert(iterator pos, size_type count, const_reference value) {
+    typename vector<Value,Allocator>::iterator
+    vector<Value, Allocator>::insert(const_iterator position, size_type count, const_reference value) {
+        iterator pos=start+(position-start);
         size_type old_capacity = end_of_storage - start;
         size_type old_size = finish - start;
         size_type size_after_pos = finish - pos;
@@ -258,30 +235,17 @@ namespace mini {
     }
 
     template<class Value, class Allocator>
-    typename vector<Value,Allocator>::iterator
-    vector<Value, Allocator>::insert(const_iterator pos, size_type count, const_reference value) {
-        iterator position=pos;
-        insert(position,count,value);
-    }
-
-    template<class Value, class Allocator>
     template<class InputIterator>
-    void vector<Value, Allocator>::insert(iterator pos, InputIterator first, InputIterator last) {
+    void vector<Value, Allocator>::insert(const_iterator position, InputIterator first, InputIterator last) {
+        iterator pos=start+(position-start);
         while (first != last)
             pos = insert(pos, *first++);
     }
 
     template<class Value, class Allocator>
-    template<class InputIterator>
-    void vector<Value, Allocator>::insert(const_iterator pos, InputIterator first, InputIterator last) {
-        iterator position=pos;
-        insert(position,first,last);
-    }
-
-    template<class Value, class Allocator>
     typename vector<Value, Allocator>::iterator
     vector<Value, Allocator>::insert(const_iterator pos, std::initializer_list<value_type> ilist) {
-        iterator position = pos;
+        iterator position = start+(pos-start);
         for (auto &item:ilist)
             position = insert(position, item);
         return position;
@@ -352,7 +316,8 @@ namespace mini {
 
     template<class Value, class Allocator>
     typename vector<Value, Allocator>::iterator
-    vector<Value, Allocator>::erase(iterator pos) {
+    vector<Value, Allocator>::erase(const_iterator position) {
+        iterator pos=start+(position-start);
         if (start == finish)
             return finish;
         std::copy(pos + 1, finish, pos);
@@ -362,32 +327,14 @@ namespace mini {
 
     template<class Value, class Allocator>
     typename vector<Value, Allocator>::iterator
-    vector<Value, Allocator>::erase(const_iterator pos) {
-        if (start == finish)
-            return finish;
-        iterator position = pos;
-        std::copy(pos + 1, finish, position);
-        pop_back();
-        return pos;
-    }
-
-
-    template<class Value, class Allocator>
-    typename vector<Value, Allocator>::iterator
-    vector<Value, Allocator>::erase(iterator first, iterator last) {
+    vector<Value, Allocator>::erase(const_iterator _first, const_iterator _last) {
+        iterator first=start+(_first-start);
+        iterator last=start+(_last-start);
         std::copy(last, finish, first);
         iterator new_finish = first + (finish - last);
         destroy(new_finish, finish);
         finish = new_finish;
         return first;
-    }
-
-    template<class Value, class Allocator>
-    typename vector<Value, Allocator>::iterator
-    vector<Value, Allocator>::erase(const_iterator first, const_iterator last) {
-        iterator first_iter=first;
-        iterator last_iter=last;
-        return erase(first_iter,last_iter);
     }
 
     template<class Value, class Allocator>
