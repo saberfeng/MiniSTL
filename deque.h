@@ -42,13 +42,34 @@ namespace mini {
                        map_pointer node_ptr) :
                 begin(begin_ptr), end(end_ptr), cur(cur_ptr), node(node_ptr) {}
 
+        /* libcpp constructor
+         * template <class _Pp, class _Rp, class _MP>
+            _LIBCPP_INLINE_VISIBILITY
+            __deque_iterator(const __deque_iterator<value_type, _Pp, _Rp, _MP, difference_type, __block_size>& __it,
+                typename enable_if<is_convertible<_Pp, pointer>::value>::type* = 0) _NOEXCEPT
+        : __m_iter_(__it.__m_iter_), __ptr_(__it.__ptr_) {}
+         *
+         */
+
+
         //allows conversion from iterator to const_iterator
         deque_iterator(const iterator &other) :
-                begin(other.begin), end(other.end), cur(other.cur), node(other.node) {}
+                begin(other.begin), end(other.end), cur(other.cur), node(const_cast<map_pointer>(other.node)) {}
 
+        //TODO:const problem
+        deque_iterator& operator=(const iterator &other){
+            begin=other.begin;
+            end=other.end;
+            cur=other.cur;
+            node=other.node;
+            return *this;
+        }
+
+        /*
         //allows conversion from const_iterator to iterator
         deque_iterator(const const_iterator &other) :
                 begin(other.begin), end(other.end), cur(other.cur), node(other.node) {}
+        */
 
         //reference is a dependent name
         base_ref operator*() { return *cur; }
@@ -100,11 +121,11 @@ namespace mini {
             size_type buffer_size = deque_buffer_size(0, sizeof(value_type));
             base_diff node_steps = 0;
             base_diff node_offset = 0;
-            if (n > 0) {
+            if (n >= 0) {
                 node_steps = (n + (cur - begin)) / buffer_size;
                 node_offset = (n + (cur - begin)) % buffer_size;
 
-            } else if (n < 0) {
+            } else {
                 node_steps = (n - (end - cur) + 1) / buffer_size;
                 node_offset = buffer_size + (n - (end - cur)) % buffer_size;
             }
@@ -204,11 +225,11 @@ namespace mini {
 
         const_reference back() const { return *finish; }
 
-        iterator begin() { return start; }
+        iterator begin() const { return start; }
 
         const_iterator cbegin() const { return start; }
 
-        iterator end() { return finish; }
+        iterator end() const { return finish; }
 
         const_iterator cend() const { return finish; }
 
@@ -241,13 +262,15 @@ namespace mini {
 
         void insert(iterator pos, size_type count, const_reference value);
 
+        void insert(const_iterator pos, size_type count, const_reference value);
+
         template<class InputIterator>
         void insert(iterator pos, InputIterator first, InputIterator last);
 
         template<class InputIterator>
         iterator insert(const_iterator pos, InputIterator first, InputIterator last);
 
-        iterator insert(iterator pos, std::initializer_list<value_type> ilist);
+        iterator insert(const_iterator pos, std::initializer_list<value_type> ilist);
 
         iterator erase(iterator pos);
 
@@ -361,9 +384,13 @@ namespace mini {
         finish.node = new_start_node + nodes_size - 1;
     }
 
+
     template<class Value, class Allocator>
     typename deque<Value, Allocator>::iterator
     deque<Value, Allocator>::insert(deque::iterator pos, const_reference value) {
+        const_iterator position = pos;
+        return insert(position,value);
+        /*
         if (pos < start || pos > finish)
             return finish;
         if (pos == finish) {
@@ -390,16 +417,54 @@ namespace mini {
             construct(pos.cur, value);
             return pos;
         }
+         */
     }
+
 
     template<class Value, class Allocator>
     typename deque<Value, Allocator>::iterator
-    deque<Value, Allocator>::insert(const_iterator pos, const_reference value) {
-
+    deque<Value, Allocator>::insert(const_iterator position, const_reference value) {
+        iterator pos = start+(position-start);
+        if (pos < start || pos > finish)
+            return finish;
+        if (pos == finish) {
+            push_back(value);
+            iterator tmp = finish;
+            --tmp;
+            return tmp;
+        } else if (pos == start) {
+            push_front(value);
+            return start;
+        } else {
+            if (pos - start < finish - pos) {
+                push_front(*start);
+                iterator copy_start = start;
+                copy_start += 2;
+                std::copy(copy_start, pos, start + 1);
+                --pos;
+            } else {
+                iterator end1 = finish;
+                iterator end2 = end1;
+                push_back(*(--end1));
+                std::copy_backward(pos, end1, end2);
+            }
+            destroy(pos.cur);
+            construct(pos.cur, value);
+            return pos;
+        }
     }
 
+    /*
     template<class Value, class Allocator>
     void deque<Value, Allocator>::insert(iterator pos, size_type count, const_reference value) {
+        for (size_type i = 0; i < count; ++i)
+            pos = insert(pos, value);
+    }
+     */
+
+    template<class Value, class Allocator>
+    void deque<Value, Allocator>::insert(const_iterator position, size_type count, const_reference value) {
+        iterator pos=start+(position-start);
         for (size_type i = 0; i < count; ++i)
             pos = insert(pos, value);
     }
@@ -416,13 +481,18 @@ namespace mini {
     template<class Value, class Allocator>
     template<class InputIterator>
     typename deque<Value, Allocator>::iterator
-    deque<Value, Allocator>::insert(const_iterator pos, InputIterator first, InputIterator last) {
-
+    deque<Value, Allocator>::insert(const_iterator position, InputIterator first, InputIterator last) {
+        iterator pos = start+(position-start);
+        while (first != last) {
+            pos = insert(pos, *first);
+            ++first;
+        }
     }
 
     template<class Value, class Allocator>
     typename deque<Value, Allocator>::iterator
-    deque<Value, Allocator>::insert(iterator pos, std::initializer_list<value_type> ilist) {
+    deque<Value, Allocator>::insert(const_iterator position, std::initializer_list<value_type> ilist) {
+        iterator pos = start+(position-start);
         for (auto &item:ilist)
             pos = insert(pos, item);
         return pos;
@@ -430,7 +500,8 @@ namespace mini {
 
     template<class Value, class Allocator>
     typename deque<Value, Allocator>::iterator
-    deque<Value, Allocator>::erase(iterator pos) {
+    deque<Value, Allocator>::erase(const_iterator position) {
+        iterator pos = start+(position-start);
         if (pos == start) {
             pop_front();
             return start;
@@ -452,7 +523,9 @@ namespace mini {
 
     template<class Value, class Allocator>
     typename deque<Value, Allocator>::iterator
-    deque<Value, Allocator>::erase(iterator first, iterator last) {
+    deque<Value, Allocator>::erase(const_iterator first_iter, const_iterator last_iter) {
+        iterator first = start+(first_iter-start);
+        iterator last = start+(last_iter-start);
         if (first == start && last == finish) {
             clear();
             return finish;

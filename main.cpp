@@ -11,6 +11,7 @@
 #include "util.h"
 #include "deque.h"
 #include "vector.h"
+#include <deque>
 
 using std::cout;
 using std::endl;
@@ -246,7 +247,7 @@ void TestDeque2(){
     deque_type deque1;
     std::vector<int> input;
 
-    for(int i=0;i<5;++i)
+    for(int i=1;i<6;++i)
         input.push_back(i);
     for(auto &item:input)
         deque1.push_front(item);
@@ -266,6 +267,23 @@ void TestDeque2(){
     PrintSmallDeque(deque1);
     iter+=5;
     iter=deque1.insert(iter,111);
+    PrintSmallDeque(deque1);
+
+    deque1.assign({1,2,3,4,5,6,7,8,9});
+    cout<<"after assign:"<<endl;
+    PrintSmallDeque(deque1);
+
+    iter=deque1.begin();
+    ++iter;
+    deque1.insert(iter,input.begin(),input.end());
+    cout<<"after insert:"<<endl;
+    PrintSmallDeque(deque1);
+
+    iter1=deque1.begin();
+    iter2=deque1.end();
+    ++iter1;
+    --iter2;
+    //deque1.erase(iter1,iter2);
     PrintSmallDeque(deque1);
 }
 
@@ -299,7 +317,7 @@ int main() {
     //DebugTestDeque();
     //TestDequeWrap();
     //TestDeque(2048);
-    //TestDeque2();
+    TestDeque2();
     //TestVector();
 
     return 0;
