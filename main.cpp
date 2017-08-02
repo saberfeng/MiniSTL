@@ -283,8 +283,13 @@ void TestDeque2(){
     iter2=deque1.end();
     ++iter1;
     --iter2;
-    //deque1.erase(iter1,iter2);
+    deque1.erase(iter1,iter2);
     PrintSmallDeque(deque1);
+
+    cout<<"second element:"<<deque1[1]<<endl;
+    cout<<"first element:"<<deque1.at(0)<<endl;
+
+
 }
 
 template <class V>
@@ -317,7 +322,7 @@ int main() {
     //DebugTestDeque();
     //TestDequeWrap();
     //TestDeque(2048);
-    TestDeque2();
+    //TestDeque2();
     //TestVector();
 
     return 0;
