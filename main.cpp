@@ -146,9 +146,9 @@ void TestPrintTree() {
     //
 }
 
-template<class Key,class Mapped>
-void PrintMap(const mini::map<Key,Mapped> &m) {
-    typename mini::map<Key,Mapped>::iterator iter = m.cbegin();
+template<class Key, class Mapped>
+void PrintMap(const mini::map<Key, Mapped> &m) {
+    typename mini::map<Key, Mapped>::iterator iter = m.cbegin();
     while (iter != m.cend())
         cout << (*(iter++)).second << " ";
     cout << endl;
@@ -166,21 +166,21 @@ void TestMap() {
 
     PrintMap(m1);
 
-    cout<<m1[std::string("two")]<<endl;
-    cout<<m1[std::string("five")]<<endl;
+    cout << m1[std::string("two")] << endl;
+    cout << m1[std::string("five")] << endl;
 
-    cout<<m1.erase(std::string("one"))<<endl;
+    cout << m1.erase(std::string("one")) << endl;
     PrintMap(m1);
 
 }
 
-void DebugTestDeque(){
+void DebugTestDeque() {
     typedef mini::deque<int> deque_type;
     typedef typename mini::deque<int>::iterator iterator;
     deque_type deque1;
-    std::vector<int> input={100,101,102,103,104,105,106};
+    std::vector<int> input = {100, 101, 102, 103, 104, 105, 106};
 
-    for(auto &item:input)
+    for (auto &item:input)
         deque1.push_back(item);
 
 
@@ -191,13 +191,13 @@ void DebugTestDeque(){
      */
 
     std::vector<int> output;
-    for(iterator iter=deque1.begin();iter!=deque1.end();++iter)
+    for (iterator iter = deque1.begin(); iter != deque1.end(); ++iter)
         output.push_back(*iter);
-    cout<<output.size()<<endl;
+    cout << output.size() << endl;
 
 }
 
-bool TestDeque(int test_num){
+bool TestDeque(int test_num) {
     typedef mini::deque<int> deque_type;
     typedef typename mini::deque<int>::iterator iterator;
     deque_type deque1;
@@ -205,110 +205,146 @@ bool TestDeque(int test_num){
 
     //int test_num=500;
 
-    for(int i=0;i<test_num;++i)
+    for (int i = 0; i < test_num; ++i)
         input.push_back(i);
-    for(auto &item:input)
+    for (auto &item:input)
         deque1.push_back(item);
 
     std::vector<int> output;
-    bool flag=true;
-    std::vector<int>::iterator vec_iter=input.begin();
-    for(iterator deque_iter=deque1.begin();deque_iter!=deque1.end();++deque_iter,++vec_iter){
-        if(*vec_iter!=*deque_iter)
-            flag=false;
+    bool flag = true;
+    std::vector<int>::iterator vec_iter = input.begin();
+    for (iterator deque_iter = deque1.begin(); deque_iter != deque1.end(); ++deque_iter, ++vec_iter) {
+        if (*vec_iter != *deque_iter)
+            flag = false;
         //cout<<*deque_iter<<endl;
     }
 
-    cout<<endl<<(flag?"Passed":"NOOOOO")<<endl<<endl;
-        //output.push_back(*iter);
+    cout << endl << (flag ? "Passed" : "NOOOOO") << endl << endl;
+    //output.push_back(*iter);
 
     return flag;
 }
 
-void TestDequeWrap(){
-    for(int i=300;i<500;++i){
-        bool result=TestDeque(i);
-        cout<<i<<"   "<<result<<endl;
+void TestDequeWrap() {
+    for (int i = 300; i < 500; ++i) {
+        bool result = TestDeque(i);
+        cout << i << "   " << result << endl;
     }
 }
 
-template <class Value>
-void PrintSmallDeque(const mini::deque<Value> &d){
-    for(typename mini::deque<Value>::const_iterator iter=d.cbegin();
-        iter!=d.cend();++iter)
-        cout<<*iter<<" ";
-    cout<<endl;
+template<class Value>
+void PrintSmallDeque(const mini::deque<Value> &d) {
+    for (typename mini::deque<Value>::const_iterator iter = d.cbegin();
+         iter != d.cend(); ++iter)
+        cout << *iter << " ";
+    cout << endl;
 }
 
-void TestDeque2(){
+void TestDeque2() {
     typedef mini::deque<int> deque_type;
     typedef typename mini::deque<int>::iterator iterator;
 
     deque_type deque1;
     std::vector<int> input;
 
-    for(int i=1;i<6;++i)
+    for (int i = 1; i < 6; ++i)
         input.push_back(i);
-    for(auto &item:input)
+    for (auto &item:input)
         deque1.push_front(item);
 
-    iterator iter1= deque1.begin();
-    iterator iter2=deque1.end();
+    iterator iter1 = deque1.begin();
+    iterator iter2 = deque1.end();
 
-    cout<<iter2-iter1<<endl;
+    cout << iter2 - iter1 << endl;
 
-    deque1.insert(deque1.begin(),100);
+    deque1.insert(deque1.begin(), 100);
     PrintSmallDeque(deque1);
-    deque1.insert(deque1.end(),101);
+    deque1.insert(deque1.end(), 101);
     PrintSmallDeque(deque1);
-    iterator iter=deque1.begin();
+    iterator iter = deque1.begin();
     ++iter;
-    iter=deque1.insert(iter,200);
+    iter = deque1.insert(iter, 200);
     PrintSmallDeque(deque1);
-    iter+=5;
-    iter=deque1.insert(iter,111);
-    PrintSmallDeque(deque1);
-
-    deque1.assign({1,2,3,4,5,6,7,8,9});
-    cout<<"after assign:"<<endl;
+    iter += 5;
+    iter = deque1.insert(iter, 111);
     PrintSmallDeque(deque1);
 
-    iter=deque1.begin();
+    deque1.assign({1, 2, 3, 4, 5, 6, 7, 8, 9});
+    cout << "after assign:" << endl;
+    PrintSmallDeque(deque1);
+
+    iter = deque1.begin();
     ++iter;
-    deque1.insert(iter,input.begin(),input.end());
-    cout<<"after insert:"<<endl;
+    deque1.insert(iter, input.begin(), input.end());
+    cout << "after insert:" << endl;
     PrintSmallDeque(deque1);
 
-    iter1=deque1.begin();
-    iter2=deque1.end();
+    iter1 = deque1.begin();
+    iter2 = deque1.end();
     ++iter1;
     --iter2;
-    deque1.erase(iter1,iter2);
+    deque1.erase(iter1, iter2);
     PrintSmallDeque(deque1);
 
-    cout<<"second element:"<<deque1[1]<<endl;
-    cout<<"first element:"<<deque1.at(0)<<endl;
+    cout << "second element:" << deque1[1] << endl;
+    cout << "first element:" << deque1.at(0) << endl;
 
 
 }
 
-template <class V>
-void PrintVector(mini::vector<V> &vec){
+template<class V>
+void PrintVector(mini::vector<V> &vec) {
     typedef typename mini::vector<int>::iterator iterator;
-    for(iterator iter=vec.begin();iter!=vec.end();++iter)
-        cout<<*iter<<endl;
-    cout<<endl;
+    for (iterator iter = vec.begin(); iter != vec.end(); ++iter)
+        cout << *iter << " ";
+    cout << endl;
 }
 
-void TestVector(){
+void TestVector() {
     typedef mini::vector<int> vector_type;
     typedef typename mini::vector<int>::iterator iterator;
     vector_type vec;
 
-    for(int i=0;i<1024;++i)
+    for (int i = 0; i < 1024; ++i)
         vec.push_back(i);
-    //PrintVector(vec);
+    cout << "vector size:" << vec.size() << endl;
+    vec.assign({1, 2, 3, 4, 5, 6});
+    PrintVector(vec);
 
+    iterator iter= vec.begin();
+    ++iter;
+    mini::deque<int> deq={11,12,13,14,15};
+    PrintSmallDeque(deq);
+    vec.insert(iter,deq.begin(),deq.end());
+    PrintVector(vec);
+
+    iter=vec.begin();
+    iter+=6;
+    vec.insert(iter,{66,67,68,69});
+    PrintVector(vec);
+
+    vec.resize(3);
+    PrintVector(vec);
+    vec.resize(5);
+    PrintVector(vec);
+
+    for(int i=0;i<vec.size();++i)
+        cout<<vec[i]<<" ";
+    cout<<endl;
+
+    vec.erase(vec.begin()+1);
+    PrintVector(vec);
+
+    vec.erase(vec.begin(),vec.end());
+    cout<<"erase all:"<<endl;
+    PrintVector(vec);
+
+    vec.push_back(100);
+    vector_type new_vec={22,33,44};
+    vec.swap(new_vec);
+    cout<<"after swap"<<endl;
+    PrintVector(vec);
+    PrintVector(new_vec);
 }
 
 int main() {
@@ -323,7 +359,7 @@ int main() {
     //TestDequeWrap();
     //TestDeque(2048);
     //TestDeque2();
-    //TestVector();
+    TestVector();
 
     return 0;
 }

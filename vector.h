@@ -238,17 +238,21 @@ namespace mini {
     template<class InputIterator>
     void vector<Value, Allocator>::insert(const_iterator position, InputIterator first, InputIterator last) {
         iterator pos=start+(position-start);
-        while (first != last)
+        while (first != last){
             pos = insert(pos, *first++);
+            ++pos;
+        }
     }
 
     template<class Value, class Allocator>
     typename vector<Value, Allocator>::iterator
-    vector<Value, Allocator>::insert(const_iterator pos, std::initializer_list<value_type> ilist) {
-        iterator position = start+(pos-start);
-        for (auto &item:ilist)
-            position = insert(position, item);
-        return position;
+    vector<Value, Allocator>::insert(const_iterator position, std::initializer_list<value_type> ilist) {
+        iterator pos = start+(position-start);
+        for (auto &item:ilist){
+            pos = insert(pos, item);
+            ++pos;
+        }
+        return pos;
     }
 
     template<class Value, class Allocator>
